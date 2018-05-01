@@ -1,0 +1,10 @@
+/out/
+/logs/
+/gradle/
+/ethercamp-test/
+/database/
+/.idea/
+/.gradle/
+/lib/
+/bin/
+sources
