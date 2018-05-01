@@ -7,4 +7,5 @@
 /.gradle/
 /lib/
 /bin/
+/build/
 sources
