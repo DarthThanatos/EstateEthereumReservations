@@ -6,13 +6,15 @@ import org.adridadou.ethereum.keystore.AccountProvider;
 import org.adridadou.ethereum.values.EthAccount;
 import org.adridadou.ethereum.values.EthValue;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import static org.adridadou.ethereum.values.EthValue.ether;
 
 public class AccountsManager {
 
-    private HashMap<String, EthAccount> accounts = new HashMap<>();
+    private AccountsMappings accounts = new AccountsMappings();
 
     private EthereumFacade ethereum;
     private CoinManager coinManager;
@@ -41,7 +43,7 @@ public class AccountsManager {
 
     private void initReservationManager(ContractPublisher contractPublisher, EthAccount mainAccount){
         try {
-            ContractPublisher.Contract<Reservation> mainContract = contractPublisher.compileAndPublish("reservation.sol", "Reservation", mainAccount ,Reservation.class);
+            ContractPublisher.Contract<Reservations> mainContract = contractPublisher.compileAndPublish("reservations.sol", "Reservations", mainAccount , Reservations.class);
             reservationManager = new ReservationManager(ethereum, mainContract);
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,18 +103,22 @@ public class AccountsManager {
         }
     }
 
-
     public void printUserCustomCurrencyBalance(String name)  {
         EthAccount account = accounts.get(name);
         if(account == null) {System.out.println("There is no account with name: " + name); return;}
         coinManager.printUserCustomCurrencyBalance(account, name);
     }
 
-
     public Coin getCoinForName(String name){
         EthAccount account = accounts.get(name);
         if(account == null) {System.out.println("There is no account with name: " + name); return null;}
         return coinManager.getCoinForName(account, name);
+    }
+
+    public Reservations getReservationsForName(String name){
+        EthAccount account = accounts.get(name);
+        if(account == null) {System.out.println("There is no account with name: " + name); return null;}
+        return reservationManager.getReservationForName(account, name);
     }
 
     public EthAccount getAccount(String name){
@@ -129,5 +135,37 @@ public class AccountsManager {
         EthAccount account = accounts.get(name);
         if(account == null) {System.out.println("There is no account with name: " + name); return;}
         System.out.println(name + "'s account: " + account.getAddress().toString());
+    }
+
+
+    private class AccountsMappings {
+
+        private HashMap<String, EthAccount> accounts = new HashMap<>();
+        private HashMap<String, EthAccount> hexToAccountMap = new HashMap<>();
+
+        void put(String name, EthAccount account){
+            accounts.put(name, account);
+            hexToAccountMap.put(account.getAddress().toString(), account);
+        }
+
+        boolean containsKey(String name){
+            return accounts.containsKey(name);
+        }
+
+        EthAccount get(String name){
+            return accounts.get(name);
+        }
+
+        Set<String> keySet(){
+            return accounts.keySet();
+        }
+
+        Collection<EthAccount> values(){
+            return accounts.values();
+        }
+
+        EthAccount getByHexString(String hexString){
+            return hexToAccountMap.get(hexString);
+        }
     }
 }

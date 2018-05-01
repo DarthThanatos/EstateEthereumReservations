@@ -25,6 +25,8 @@ public class UserCLI extends CLI {
         commands.put("pc", new PayCustomCurrencyCommand(accountsManager, this));
         commands.put("eb", new PrintEtherBalanceCommand(accountsManager));
         commands.put("ccb", new PrintCustomCurrencyBalanceCommand(accountsManager));
+        commands.put("pub", new PublishEstateCommand(accountsManager, this));
+        commands.put("estate", new PrintEstateCommand(accountsManager, this));
         HelpCommand.addHelpToCommands(commands, this); //this needs to be called as the last one
 
         return commands;
