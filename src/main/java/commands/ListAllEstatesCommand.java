@@ -1,6 +1,7 @@
 package commands;
 
 import ethereum.AccountsManager;
+import ethereum.ReservationManager;
 import interfaces.Reservations;
 import cli.UserCLI;
 import org.adridadou.ethereum.values.EthAccount;
@@ -58,7 +59,7 @@ public class ListAllEstatesCommand extends CLICommand {
     @SuppressWarnings("EmptyCatchBlock")
     private void printEstate(Reservations reservationsForName, int i){
         try {
-            System.out.println(reservationsForName.getEstateByIndex(i));
+            ReservationManager.Estate.printEstateWithTenantInfo(reservationsForName, reservationsForName.getEstateByIndex(i), i, accountsManager);
         }catch(Exception e){ }
     }
 
@@ -83,7 +84,7 @@ public class ListAllEstatesCommand extends CLICommand {
     @SuppressWarnings("EmptyCatchBlock")
     private void printEstateOfOwner(Reservations reservationsForName, EthAccount account, int i){
         try {
-            System.out.println(reservationsForName.getEstateOfOwnerByIndex(account, i));
+            ReservationManager.Estate.printEstateWithTenantInfo(reservationsForName, reservationsForName.getEstateOfOwnerByIndex(account, i), account, i, accountsManager);
         }catch(Exception e){ }
     }
 

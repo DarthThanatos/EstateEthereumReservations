@@ -4,7 +4,7 @@ contract Coin {
 
     // The keyword "public" makes those variables
     // readable from outside.
-    address public minter;
+    address minter;
     mapping (address => uint) public balances;
 
     // Events allow light clients to react on
@@ -22,6 +22,10 @@ contract Coin {
         if (msg.sender != minter) return;
         balances[receiver] += amount;
         Minted(toString(receiver), amount);
+    }
+
+    function getMinter() constant public returns(address){
+        return minter;
     }
 
     function getBalance(address receiver) public returns(uint){

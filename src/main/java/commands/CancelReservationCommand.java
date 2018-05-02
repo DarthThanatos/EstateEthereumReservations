@@ -18,6 +18,6 @@ public class CancelReservationCommand extends ReservationCommand {
 
     @Override
     void makeReservationAction(EthAccount account, int index, int day, Reservations reservationsForName) throws Exception {
-        reservationsForName.tryToCancel(account, index, day);
+        reservationsForName.tryToCancel(account, index, day).get();
     }
 }

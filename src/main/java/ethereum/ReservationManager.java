@@ -64,13 +64,41 @@ public class ReservationManager {
         }
 
         @Override public String toString(){
-            return "Estate \n\towner: " + estateOwnerHexString +
+            return "Estate \n\towner: " + estateOwnerHexString + " ( %s )" +
                     "\n\tname: " + name +
                     "\n\tprice: " + price +
-                    "\n\tDays available for making reservations: " + getReadableDays(daysAvailabilityStates, "No available days for making reservations.") +
-                    "\n\tDays already reserved: " + getReadableDays(daysReservationStates, "No reservations made so far");
+                    "\n\tDays available for making reservations: " + getReadableDays(daysAvailabilityStates, "No available days for making reservations.");
         }
 
+        public static void printEstateWithTenantInfo(Reservations reservationForName, Estate estate,  EthAccount owner, int index, AccountsManager accountsManager){
+            System.out.print(String.format(estate.toString(), accountsManager.getReadableNameFromHexForm(estate.estateOwnerHexString)));
+            System.out.println(reservedWithTenants(reservationForName, estate,  owner, index, accountsManager));
+        }
+
+        public static void printEstateWithTenantInfo(Reservations reservationForName, Estate estate, int index, AccountsManager accountsManager){
+            System.out.print(String.format(estate.toString(), accountsManager.getReadableNameFromHexForm(estate.estateOwnerHexString)));
+            System.out.println(reservedWithTenants(reservationForName, estate,  null, index, accountsManager));
+        }
+
+        private static String reservedWithTenants(Reservations reservations, Estate estate,  EthAccount owner, int index, AccountsManager accountsManager){
+            String res ="\n\tDays already reserved: ";
+            String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            StringBuilder stringBuilder = new StringBuilder();
+            boolean atLeastOneTrue = false;
+            for (int i = 0; i < 7; i++) {
+                if (estate.getDaysReservationStates()[i]) {
+                    stringBuilder.append(days[i]).append(":").append(
+                            owner != null
+                            ? accountsManager.getReadableNameFromHexForm(reservations.getTenantOfOwner(owner, index, i))
+                            : accountsManager.getReadableNameFromHexForm(reservations.getTenant(index, i))
+                    ).append(" ");
+                    atLeastOneTrue = true;
+                }
+            }
+            return atLeastOneTrue ? res + stringBuilder.toString() :  "\n\tNo reservations made so far";
+        }
+
+        @SuppressWarnings("SameParameterValue")
         private String getReadableDays(Boolean[] dayStates, String defaultTxt) {
             String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
             StringBuilder res = new StringBuilder();
@@ -82,6 +110,10 @@ public class ReservationManager {
                 }
             }
             return atLeastOneTrue ? res.toString() : defaultTxt;
+        }
+
+        Boolean[] getDaysReservationStates() {
+            return daysReservationStates;
         }
     }
 
@@ -189,4 +221,6 @@ public class ReservationManager {
             return Collections.singletonList(estatesOwnerAddressString);
         }
     }
+
 }
+

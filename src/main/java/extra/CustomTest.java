@@ -26,7 +26,8 @@ public class CustomTest {
     private static final EthereumFacade ethereum = forTest();
 
     public static  void main(String[] args) throws Exception{
-        new MainCLI(ethereum, accountsManager).mainLoop();
+        coinContractTest();
+        stop();
     }
 
 
@@ -67,8 +68,8 @@ public class CustomTest {
         Observable<Sent> sentEvent = ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, "Sent", Sent.class);
         Observable<Minted> mintedEvent = ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, "Minted", Minted.class);
 
-        sentEvent.subscribe(sentEventHandler::handle);
-        mintedEvent.subscribe(mintedEventHandler::handle);
+//        sentEvent.subscribe(sentEventHandler::handle);
+//        mintedEvent.subscribe(mintedEventHandler::handle);
 
         coin.mint(mainAccount, 1000).get();
 
@@ -85,15 +86,15 @@ public class CustomTest {
         aliceCoin.send(bobAccount, 25).get();
 
         Coin eveCoin = ethereum.createContractProxy(mainContract.compiledContract, mainContract.contractAddress, eveAccount, Coin.class);
-        eveCoin.send(aliceAccount, 200).get();
+//        eveCoin.send(aliceAccount, 200).get();
 
         coin.mint(bobAccount, 10000).get();
         bobCoin.send(aliceAccount, 1000).get();
         ethereum.sendEther(bobAccount, aliceAccount.getAddress(), ether(10)).get();
-
         accountsManager.printCustomCurrencyBalances();
         accountsManager.printEthereumBalances();
     }
+
 
     private static <T> Contract<T> compileAndPublish(String contractFileName, String contractName, Class<T> interfaceClass)throws Exception{
         EthAccount mainAccount = accountsManager.getAccount("main");

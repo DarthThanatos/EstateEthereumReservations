@@ -1,6 +1,7 @@
 package commands;
 
 import ethereum.AccountsManager;
+import ethereum.ReservationManager;
 import interfaces.Reservations;
 import cli.UserCLI;
 import org.adridadou.ethereum.values.EthAccount;
@@ -32,7 +33,7 @@ public class PrintEstateCommand extends CLICommand {
     private void printEstateOfOwnerAt(EthAccount account, int index){
         Reservations reservationsForName = accountsManager.getReservationsForName(userCLI.getUserName());
         try {
-            System.out.println(reservationsForName.getEstateOfOwnerByIndex(account, index));
+            ReservationManager.Estate.printEstateWithTenantInfo(reservationsForName, reservationsForName.getEstateOfOwnerByIndex(account, index), account, index, accountsManager);
         }catch(Exception e){
             System.out.println("No estate with specified parameters found");
         }

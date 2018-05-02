@@ -13,7 +13,7 @@ public class MakeReservationCommand extends ReservationCommand {
 
     @Override
     void makeReservationAction(EthAccount estateOwnerAccount, int estateIndex, int day, Reservations reservationForName) throws Exception {
-        reservationForName.tryToReserve(estateOwnerAccount, estateIndex, day);
+        reservationForName.tryToReserve(estateOwnerAccount, estateIndex, day).get();
     }
 
     @Override

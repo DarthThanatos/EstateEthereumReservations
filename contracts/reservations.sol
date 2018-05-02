@@ -10,10 +10,13 @@ contract Reservations {
         uint price;
         bool[] daysAvailabilityStates;
         bool[] daysReservationStates;
+        bool[] paidForDayReservation;
         string[] tenantAddressesStrings;
+        uint globalIndex;
     }
 
     mapping (address => Estate[]) estatesByOwner;
+
     Estate[] allEstates;
 
     event PublishedEstate(string estatesOwnerAddressString, string name, uint price, bool[]daysAvailabilityStates);
@@ -26,13 +29,29 @@ contract Reservations {
 
     function publishEstate(string name, uint price, bool[] daysAvailabilityStates, bool[] daysReservationStates){
         address estatesOwner = msg.sender;
+
         string[] memory tenantAddressesStrings =  new string[](7);
+        bool[] memory paidForDayReservation = new bool[](7);
+        for(uint i = 0; i < 7; i++) {
+            tenantAddressesStrings[i] = "";
+            paidForDayReservation[i] = false;
+        }
+
         string memory estatesOwnerAddressString = toString(estatesOwner);
-        Estate memory estate = Estate(estatesOwnerAddressString, name, price, daysAvailabilityStates, daysReservationStates, tenantAddressesStrings);
+        Estate memory estate = Estate(estatesOwnerAddressString, name, price, daysAvailabilityStates, daysReservationStates, paidForDayReservation, tenantAddressesStrings, allEstates.length);
         estatesByOwner[estatesOwner].push(estate);
         allEstates.push(estate);
 
         PublishedEstate(estatesOwnerAddressString, name, price, daysAvailabilityStates);
+    }
+
+
+    function tryToChangeAvailableDay(uint estateLocalIndex, uint day, bool available) public{
+        Estate estate = estatesByOwner[msg.sender][estateLocalIndex];
+        if(estate.daysReservationStates[day]) return;
+
+        estate.daysAvailabilityStates[day] = available;
+        allEstates[estate.globalIndex].daysAvailabilityStates[day] = available;
     }
 
     function getEstateOfOwnerByIndex(address estatesOwner, uint index) constant public returns(string, string , uint , bool[] , bool[] ){
@@ -53,14 +72,19 @@ contract Reservations {
         return allEstates.length;
     }
 
+
     function tryToReserve(address estateOwner, uint estateIndex, uint day) public{
         address client = msg.sender;
         Estate estate = estatesByOwner[estateOwner][estateIndex];
         if(estateOwner == client) return;
         if(day < 0 && day >= 7) return;
         if(!estate.daysAvailabilityStates[day] || estate.daysReservationStates[day]) return;
+
         estate.daysReservationStates[day] = true;
         estate.tenantAddressesStrings[day] = toString(client);
+
+        allEstates[estate.globalIndex].daysReservationStates[day] = true;
+        allEstates[estate.globalIndex].tenantAddressesStrings[day] = toString(client);
 
         ReservationMade(
             toString(estateOwner),
@@ -69,6 +93,14 @@ contract Reservations {
             estatesByOwner[estateOwner][estateIndex].tenantAddressesStrings[day],
             day
         );
+    }
+
+    function getTenantOfOwner(address estateOwner, uint estateIndex, uint day) constant public returns(string){
+        return estatesByOwner[estateOwner][estateIndex].tenantAddressesStrings[day];
+    }
+
+    function getTenant(uint estateIndex, uint day) constant public returns(string){
+        return allEstates[estateIndex].tenantAddressesStrings[day];
     }
 
     function tryToCancel(address estateOwner, uint estateIndex, uint day) public{
@@ -86,6 +118,9 @@ contract Reservations {
 
         estate.daysReservationStates[day] = false;
         estate.tenantAddressesStrings[day] = "";
+
+        allEstates[estate.globalIndex].daysReservationStates[day] = false;
+        allEstates[estate.globalIndex].tenantAddressesStrings[day] = "";
 
         ReservationCanceled(
             toString(estateOwner),

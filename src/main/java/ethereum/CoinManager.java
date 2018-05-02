@@ -43,7 +43,7 @@ class CoinManager {
         try {
             System.out.println("Balance of " + name + " in custom currency: " + coin.getBalance(account).get());
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
