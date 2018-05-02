@@ -77,7 +77,7 @@ public class ReservationManager {
     private void handleReservation(ReservationMade reservationMade){
         ReservationDetails reservationDetails = new ReservationDetails(reservationMade.estateOwnerAddressString, reservationMade.estateIndex, reservationMade.day);
         reservationActiveMap.put(reservationDetails, true);
-        Observable.interval(30, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).forEachWhile(
+        Observable.interval(1, TimeUnit.MINUTES).subscribeOn(Schedulers.newThread()).forEachWhile(
                 aLong -> shouldStopObservingReservation(aLong, reservationDetails),
                 Throwable::printStackTrace
         );
