@@ -27,13 +27,15 @@ class CoinManager {
     }
 
     private void observeEvents(AccountsManager accountsManager){
-        EventHandler<Minted> mintedEventHandler = new EventHandler<>(accountsManager);
-        EventHandler<Sent> sentEventHandler = new EventHandler<>(accountsManager);
-        Observable<Sent> sentEvent = ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, "Sent", Sent.class);
-        Observable<Minted> mintedEvent = ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, "Minted", Minted.class);
-        sentEvent.subscribe(sentEventHandler::handle, Throwable::printStackTrace);
-        mintedEvent.subscribe(mintedEventHandler::handle, Throwable::printStackTrace);
+        observeEvent(accountsManager, "Sent", Sent.class);
+        observeEvent(accountsManager, "Minted", Minted.class);
+    }
 
+    private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass){
+        EventHandler<T> eventHandler = new EventHandler<>(accountsManager);
+        Observable<T> event =
+                ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, eventName, eventClass);
+        event.subscribe(eventHandler::handle, Throwable::printStackTrace);
     }
 
     void printUserCustomCurrencyBalance(EthAccount account, String name)  {

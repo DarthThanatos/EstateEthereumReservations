@@ -26,12 +26,8 @@ public abstract class PrintCommand extends CLICommand {
 
     @Override
     public void execute() {
-        if(parsedCommandLine.args.size() == 0) {
-            printerOfAll.printAll(accountsManager);
-        }
-        else{
-            printerOfOne.printOne(accountsManager, parsedCommandLine.args.get(0));
-        }
+        if(parsedCommandLine.args.size() == 0) printerOfAll.printAll(accountsManager);
+        else printerOfOne.printOne(accountsManager, parsedCommandLine.args.get(0));
     }
 
     @Override

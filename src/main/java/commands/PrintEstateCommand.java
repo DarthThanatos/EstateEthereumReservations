@@ -21,31 +21,46 @@ public class PrintEstateCommand extends CLICommand {
 
     @Override
     public void execute() {
-        if(parsedCommandLine.args.size() < 2){
-            System.out.println("Invalid usage, check help command for details");
-            return;
-        }
-
-        String estateOwnerName = parsedCommandLine.args.get(0);
-        EthAccount account = accountsManager.getAccount(estateOwnerName);
-        if(account == null){
-            System.out.println("There is no user with such a name");
-            return;
-        }
-
+        EthAccount account;
         int index;
-        try{
-            index = Integer.parseInt(parsedCommandLine.args.get(1));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid amount");
-            return;
-        }
 
+        if(argcCorrect()  && ((account = getAccount()) != null) && ((index = getIndex()) != -1)){
+            printEstateOfOwnerAt(account, index);
+        }
+    }
+
+    private void printEstateOfOwnerAt(EthAccount account, int index){
         Reservations reservationsForName = accountsManager.getReservationsForName(userCLI.getUserName());
         try {
             System.out.println(reservationsForName.getEstateOfOwnerByIndex(account, index));
         }catch(Exception e){
             System.out.println("No estate with specified parameters found");
+        }
+    }
+
+    private boolean argcCorrect(){
+        if(parsedCommandLine.args.size() < 2){
+            System.out.println("Invalid usage, check help command for details");
+            return false;
+        }
+        return true;
+    }
+
+    private EthAccount getAccount(){
+        String estateOwnerName = parsedCommandLine.args.get(0);
+        EthAccount account = accountsManager.getAccount(estateOwnerName);
+        if(account == null){
+            System.out.println("There is no user with such a name");
+        }
+        return account;
+    }
+
+    private int getIndex(){
+        try{
+            return Integer.parseInt(parsedCommandLine.args.get(1));
+        }catch(NumberFormatException e){
+            System.out.println("You need to specify a valid amount");
+            return -1;
         }
     }
 

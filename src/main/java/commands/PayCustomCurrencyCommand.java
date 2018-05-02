@@ -18,15 +18,20 @@ public class PayCustomCurrencyCommand extends TargetedCommandWithAmount {
     @Override
     void onArgumentsCorrect(String targetName, int amount) {
         Coin coin = accountsManager.getCoinForName(userCLI.getUserName());
-        try {
-            coin.send(accountsManager.getAccount(targetName), amount).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        sendAmount(coin, targetName, amount);
     }
 
     @Override
     public String getDescription() {
         return "Pays specified amount of the custom currency, targeting the account of a user with the given name.";
+    }
+
+    private void sendAmount(Coin coin, String targetName, int amount){
+        try {
+            coin.send(accountsManager.getAccount(targetName), amount).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
     }
 }

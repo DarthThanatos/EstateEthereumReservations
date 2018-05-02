@@ -16,7 +16,8 @@ contract Reservations {
     mapping (address => Estate[]) estatesByOwner;
     Estate[] allEstates;
 
-    event PublishedEstate(string estatesOwnerAddressString, string name, uint price, bool[]daysAvailabilityStates); //
+    event PublishedEstate(string estatesOwnerAddressString, string name, uint price, bool[]daysAvailabilityStates);
+    event ReservationMade(string estateOwnerAddressString, uint estateIndex, string name, string clientAddrString, uint day);
 
     function Reservations() public {
         contractOwner = msg.sender;
@@ -30,16 +31,16 @@ contract Reservations {
         estatesByOwner[estatesOwner].push(estate);
         allEstates.push(estate);
 
-        PublishedEstate(estatesOwnerAddressString, name, price, daysAvailabilityStates); //
+        PublishedEstate(estatesOwnerAddressString, name, price, daysAvailabilityStates);
     }
 
     function getEstateOfOwnerByIndex(address estatesOwner, uint index) constant public returns(string, string , uint , bool[] , bool[] ){
-        Estate memory estate = estatesByOwner[estatesOwner][index];
+        Estate estate = estatesByOwner[estatesOwner][index];
         return (estate.estatesOwnerAddressString, estate.name, estate.price, estate.daysAvailabilityStates, estate.daysReservationStates);
     }
 
     function getEstateByIndex(uint index) constant public returns(string, string , uint , bool[] , bool[] ){
-        Estate memory estate = allEstates[index];
+        Estate estate = allEstates[index];
         return (estate.estatesOwnerAddressString, estate.name, estate.price, estate.daysAvailabilityStates, estate.daysReservationStates);
     }
 
@@ -51,7 +52,26 @@ contract Reservations {
         return allEstates.length;
     }
 
-    function tryToReserve(address client, uint day) public{
+    function tryToReserve(address estateOwner, uint estateIndex, uint day) public{
+        address client = msg.sender;
+        Estate estate = estatesByOwner[estateOwner][estateIndex];
+        if(estateOwner == client) return;
+        if(day < 0 && day >= 7) return;
+        if(!estate.daysAvailabilityStates[day] || estate.daysReservationStates[day]) return;
+        estate.daysReservationStates[day] = true;
+        estate.tenantAddressesStrings[day] = toString(client);
+
+        ReservationMade(
+            toString(estateOwner),
+            estateIndex,
+            estatesByOwner[estateOwner][estateIndex].name,
+            estatesByOwner[estateOwner][estateIndex].tenantAddressesStrings[day],
+            day
+        );
+    }
+
+    function tryToCancel(address estateOwner, uint estateIndex, uint day) public{
+        address client = msg.sender;
 
     }
 

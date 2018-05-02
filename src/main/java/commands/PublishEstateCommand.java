@@ -21,35 +21,12 @@ public class PublishEstateCommand extends CLICommand {
 
     @Override
     public void execute() {
-        if(parsedCommandLine.args.size() < 2){
-            System.out.println("Invalid usage, check help command for details");
-            return;
-        }
-
-        String name = parsedCommandLine.args.get(0);
         int price;
-        try{
-            price = Integer.parseInt(parsedCommandLine.args.get(1));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid amount");
-            return;
+        String estateName;
+        if(argcCorrect() && (price = getPrice())!= -1){
+            estateName = parsedCommandLine.args.get(0);
+            publishEstate(estateName, price);
         }
-
-        Reservations reservations = accountsManager.getReservationsForName(userCLI.getUserName());
-        try {
-            reservations.publishEstate(name, price, booleanArrayOf(true), booleanArrayOf(false)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private Boolean[] booleanArrayOf(Boolean val){
-        Boolean[] res = new Boolean[7];
-        for (int i = 0; i < 7; i++){
-            res[i] = val;
-        }
-        return res;
     }
 
     @Override
@@ -66,4 +43,40 @@ public class PublishEstateCommand extends CLICommand {
     public String getDescription() {
         return "Publishes a new estate offer.";
     }
+
+
+    private void publishEstate(String name, int price){
+        Reservations reservations = accountsManager.getReservationsForName(userCLI.getUserName());
+        try {
+            reservations.publishEstate(name, price, booleanArrayOf(true), booleanArrayOf(false)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean argcCorrect(){
+        if(parsedCommandLine.args.size() < 2){
+            System.out.println("Invalid usage, check help command for details");
+            return false;
+        }
+        return true;
+    }
+
+    private int getPrice(){
+        try{
+            return Integer.parseInt(parsedCommandLine.args.get(1));
+        }catch(NumberFormatException e){
+            System.out.println("You need to specify a valid amount");
+            return -1;
+        }
+    }
+
+    private Boolean[] booleanArrayOf(Boolean val){
+        Boolean[] res = new Boolean[7];
+        for (int i = 0; i < 7; i++){
+            res[i] = val;
+        }
+        return res;
+    }
+
 }

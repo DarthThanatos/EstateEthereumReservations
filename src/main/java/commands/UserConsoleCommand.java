@@ -21,20 +21,11 @@ public class UserConsoleCommand extends CLICommand {
 
     @Override
     public void execute() {
-        if(parsedCommandLine.args.size() < 1){
-            System.out.println("This command requires a user name as an argument. Type \'help\' for more information.");
-            return;
+        String name;
+        if(argcCorrect() && (name = getName())!= null) {
+            userCLI.setUserName(name);
+            userCLI.mainLoop();
         }
-
-        String name = parsedCommandLine.args.get(0);
-        EthAccount account = accountsManager.getAccount(name);
-        if(account == null){
-            System.out.println("There is no user of such name, check if you spelled the name correctly, or add new account (see \'add\' command).");
-            return;
-        }
-
-        userCLI.setUserName(name);
-        userCLI.mainLoop();
     }
 
     @Override
@@ -50,5 +41,24 @@ public class UserConsoleCommand extends CLICommand {
     @Override
     public String getDescription() {
         return "Login as a user with the given name. This name has to exist.";
+    }
+
+
+    private boolean argcCorrect(){
+        if(parsedCommandLine.args.size() < 1){
+            System.out.println("This command requires a user name as an argument. Type \'help\' for more information.");
+            return false;
+        }
+        return true;
+    }
+
+    private String getName(){
+        String name = parsedCommandLine.args.get(0);
+        EthAccount account = accountsManager.getAccount(name);
+        if(account == null){
+            System.out.println("There is no user of such name, check if you spelled the name correctly, or add new account (see \'add\' command).");
+            return null;
+        }
+        return name;
     }
 }

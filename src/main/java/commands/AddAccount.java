@@ -16,11 +16,21 @@ public class AddAccount extends CLICommand {
 
     @Override
     public void execute() {
+        if(argcCorrect()) {
+            String name = parsedCommandLine.args.get(0);
+            tryToAddAccount(name);
+        }
+    }
+
+    private boolean argcCorrect(){
         if(parsedCommandLine.args.size() == 0){
             System.out.println("This command takes a name of a new user as an argument. Note that this name must be unique.");
-            return;
+            return false;
         }
-        String name = parsedCommandLine.args.get(0);
+        return true;
+    }
+
+    private void tryToAddAccount(String name){
         try {
             accountsManager.addToAccounts(name);
             System.out.println("Warning: this is a brand new account with 0 ether balance. Inform the main account to sent this new user some resources.");

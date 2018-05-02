@@ -7,6 +7,7 @@ import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.values.EthAccount;
 import rx.Observable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +26,16 @@ public class ReservationManager {
     }
 
     private void observeEvents(AccountsManager accountsManager){
-        EventHandler<PublishedEstate> publishedEstateEventHandler = new EventHandler<>(accountsManager);
-        Observable<PublishedEstate> publishedEstateEvent =
-                ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, "PublishedEstate", PublishedEstate.class);
-        publishedEstateEvent.subscribe(publishedEstateEventHandler::handle, Throwable::printStackTrace);
+        observeEvent(accountsManager, "PublishedEstate", PublishedEstate.class);
+        observeEvent(accountsManager, "ReservationMade", ReservationMade.class);
+
+    }
+
+    private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass){
+        EventHandler<T> eventHandler = new EventHandler<>(accountsManager);
+        Observable<T> event =
+                ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, eventName, eventClass);
+        event.subscribe(eventHandler::handle, Throwable::printStackTrace);
 
     }
 
@@ -58,6 +65,38 @@ public class ReservationManager {
 
         @Override public String toString(){
             return "Estate \n\towner: " + estateOwnerHexString + "\n\tname: " + name + "\n\tprice: " + price;
+        }
+    }
+
+    public static class ReservationMade extends SolEvent{
+
+        private String estateOwnerAddressString;
+        private int estateIndex;
+        private String name;
+        private String clientAddrString;
+        private int day;
+
+        public ReservationMade(String estateOwnerAddressString, int estateIndex, String name, String clientAddrString, int day){
+            this.estateOwnerAddressString = estateOwnerAddressString;
+            this.estateIndex = estateIndex;
+            this.name = name;
+            this.clientAddrString = clientAddrString;
+            this.day = day;
+        }
+
+        @Override public String toString(){
+            String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            return "Reservation was made" +
+                    "\n\towner: " + estateOwnerAddressString + " ( %s ) " +
+                    "\n\testate index: " + estateIndex +
+                    "\n\testate name: " + name +
+                    "\n\ttenant: " + clientAddrString + " ( %s ) " +
+                    "\n\tday: " + days[day];
+        }
+
+        @Override
+        public List<String> addressesToTranslate() {
+            return Arrays.asList(estateOwnerAddressString, clientAddrString);
         }
     }
 

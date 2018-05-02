@@ -17,27 +17,10 @@ public abstract class TargetedCommandWithAmount extends CLICommand {
 
     @Override
     public void execute() {
-
-        if(parsedCommandLine.args.size() < 2){
-            System.out.println("This command requires the userName of the target and the amount you wish to be minted");
-            return;
-        }
-
-        String targetName = parsedCommandLine.args.get(0);
-        EthAccount targetAccount = accountsManager.getAccount(targetName);
-        if(targetAccount == null) {
-            System.out.println("Error: target does not exist!");
-            return;
-        }
-
+        String targetName;
         int amount;
-        try{
-            amount = Integer.parseInt(parsedCommandLine.args.get(1));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid amount");
-            return;
-        }
-        onArgumentsCorrect(targetName, amount);
+        if(argcCorrect() && (targetName = getTargetName()) != null && (amount = getAmount()) != -1)
+            onArgumentsCorrect(targetName, amount);
     }
 
     @Override
@@ -52,5 +35,31 @@ public abstract class TargetedCommandWithAmount extends CLICommand {
 
     abstract void onArgumentsCorrect(String targetName, int amount);
 
+    private boolean argcCorrect(){
+        if(parsedCommandLine.args.size() < 2){
+            System.out.println("This command requires the userName of the target and the amount you wish to be minted");
+            return false;
+        }
+        return true;
+    }
+
+    private String getTargetName(){
+        String targetName = parsedCommandLine.args.get(0);
+        EthAccount targetAccount = accountsManager.getAccount(targetName);
+        if(targetAccount == null) {
+            System.out.println("Error: target does not exist!");
+            return null;
+        }
+        return targetName;
+    }
+
+    private int getAmount(){
+        try{
+            return Integer.parseInt(parsedCommandLine.args.get(1));
+        }catch(NumberFormatException e){
+            System.out.println("You need to specify a valid amount");
+            return -1;
+        }
+    }
 
 }

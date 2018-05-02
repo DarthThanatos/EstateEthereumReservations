@@ -24,21 +24,29 @@ public class SendEtherCommand extends TargetedCommandWithAmount {
     void onArgumentsCorrect(String targetName, int amount) {
         EthAccount srcAccount = accountsManager.getAccount(userCLI.getUserName());
         EthAccount targetAccount = accountsManager.getAccount(targetName);
-        try {
-            System.out.println("trying to send " + amount + " ether from " + userCLI.getUserName() + " to " + targetName);
-            int MAX_ETHER_AMOUNT = 10;
-            if(amount > MAX_ETHER_AMOUNT) {
-                System.out.println("Warning: sending only " + MAX_ETHER_AMOUNT + " as this is the maximum allowed amount to send");
-                amount = MAX_ETHER_AMOUNT;
-            }
-            ethereum.sendEther(srcAccount, targetAccount.getAddress(), ether(amount)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        sendEtherFromTo(srcAccount, targetAccount, amount);
     }
 
     @Override
     public String getDescription() {
         return "Sends specified amount of ether to the account of a user with the given name.";
     }
+
+    private void sendEtherFromTo(EthAccount srcAccount, EthAccount targetAccount, int amount){
+        try {
+            ethereum.sendEther(srcAccount, targetAccount.getAddress(), ether(getCorrectAmountToSend(amount))).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getCorrectAmountToSend(int amount){
+        int MAX_ETHER_AMOUNT = 10;
+        if(amount > MAX_ETHER_AMOUNT) {
+            System.out.println("Warning: sending only " + MAX_ETHER_AMOUNT + " as this is the maximum allowed amount to send");
+            amount = MAX_ETHER_AMOUNT;
+        }
+        return amount;
+    }
+
 }

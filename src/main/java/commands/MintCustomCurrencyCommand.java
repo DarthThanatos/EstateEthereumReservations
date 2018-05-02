@@ -16,9 +16,7 @@ public class MintCustomCurrencyCommand extends TargetedCommandWithAmount {
 
     @Override
     public void execute() {
-        if(!userCLI.getUserName().equals("main")){
-            System.out.println("Warning to " + userCLI.getUserName() + ": you are not the owner of the contract. Your request will be ignored by the contract code.");
-        }
+        warnNonMainUser();
         super.execute();
 
     }
@@ -26,6 +24,16 @@ public class MintCustomCurrencyCommand extends TargetedCommandWithAmount {
     @Override
     void onArgumentsCorrect(String targetName, int amount) {
         Coin coin = accountsManager.getCoinForName(userCLI.getUserName());
+        mintCoins(coin, targetName, amount);
+    }
+
+    private void warnNonMainUser(){
+        if(!userCLI.getUserName().equals("main")){
+            System.out.println("Warning to " + userCLI.getUserName() + ": you are not the owner of the contract. Your request will be ignored by the contract code.");
+        }
+    }
+
+    private void mintCoins(Coin coin, String targetName, int amount){
         try {
             coin.mint(accountsManager.getAccount(targetName), amount).get();
         } catch (InterruptedException | ExecutionException e) {
