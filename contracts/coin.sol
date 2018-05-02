@@ -1,6 +1,7 @@
 pragma solidity ^0.4.0;
 
 contract Coin {
+
     // The keyword "public" makes those variables
     // readable from outside.
     address public minter;
@@ -54,4 +55,5 @@ contract Coin {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
+
 }

@@ -116,4 +116,5 @@ contract Reservations {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
     }
+
 }

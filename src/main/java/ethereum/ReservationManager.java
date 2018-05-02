@@ -64,7 +64,24 @@ public class ReservationManager {
         }
 
         @Override public String toString(){
-            return "Estate \n\towner: " + estateOwnerHexString + "\n\tname: " + name + "\n\tprice: " + price;
+            return "Estate \n\towner: " + estateOwnerHexString +
+                    "\n\tname: " + name +
+                    "\n\tprice: " + price +
+                    "\n\tDays available for making reservations: " + getReadableDays(daysAvailabilityStates, "No available days for making reservations.") +
+                    "\n\tDays already reserved: " + getReadableDays(daysReservationStates, "No reservations made so far");
+        }
+
+        private String getReadableDays(Boolean[] dayStates, String defaultTxt) {
+            String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            StringBuilder res = new StringBuilder();
+            boolean atLeastOneTrue = false;
+            for (int i = 0; i < 7; i++) {
+                if (dayStates[i]) {
+                    res.append(days[i]).append(" ");
+                    atLeastOneTrue = true;
+                }
+            }
+            return atLeastOneTrue ? res.toString() : defaultTxt;
         }
     }
 
@@ -157,10 +174,14 @@ public class ReservationManager {
         private String getReadableAvailableDays(){
             String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
             StringBuilder res = new StringBuilder();
+            boolean atLeastOneTrue = false;
             for(int i = 0; i < 7; i++){
-                if(daysAvailabilityStates[i]) res.append(days[i]).append(" ");
+                if(daysAvailabilityStates[i]) {
+                    res.append(days[i]).append(" ");
+                    atLeastOneTrue = true;
+                }
             }
-            return res.toString();
+            return atLeastOneTrue ? res.toString() : "No available days for making reservations.";
         }
 
         @Override
