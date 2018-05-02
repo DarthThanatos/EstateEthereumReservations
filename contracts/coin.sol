@@ -8,7 +8,7 @@ contract Coin {
 
     // Events allow light clients to react on
     // changes efficiently.
-    event Sent(string from, string to, uint amount);
+    event Sent(string from, string to, uint amount, uint pastFromBalance, uint currentFromBalance, uint pastToBalance, uint currentToBalance);
     event Minted(string receiver, uint amount);
 
     // This is the constructor whose code is
@@ -29,9 +29,13 @@ contract Coin {
 
     function send(address receiver, uint amount) public {
         if (balances[msg.sender] < amount) return;
+        uint prev_src_balance = balances[msg.sender];
+        uint prev_target_balance = balances[receiver];
         balances[msg.sender] -= amount;
         balances[receiver] += amount;
-        Sent(toString(msg.sender), toString(receiver), amount);
+        uint cur_src_balnce = balances[msg.sender];
+        uint cur_target_balance = balances[receiver];
+        Sent(toString(msg.sender), toString(receiver), amount, prev_src_balance, cur_src_balnce, prev_target_balance, cur_target_balance);
     }
 
     function toString(address x) returns (string) {

@@ -35,7 +35,7 @@ public class AccountsManager {
     private void initCoinManager(ContractPublisher contractPublisher, EthAccount mainAccount){
         try {
             ContractPublisher.Contract<Coin> mainContract = contractPublisher.compileAndPublish("coin.sol", "Coin", mainAccount ,Coin.class);
-            coinManager = new CoinManager(ethereum, mainContract);
+            coinManager = new CoinManager(ethereum, mainContract, this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,14 +138,20 @@ public class AccountsManager {
     }
 
 
+    public String getReadableNameFromHexForm(String hexForm){
+        return accounts.getNameByHexString(hexForm);
+    }
+
     private class AccountsMappings {
 
         private HashMap<String, EthAccount> accounts = new HashMap<>();
         private HashMap<String, EthAccount> hexToAccountMap = new HashMap<>();
+        private HashMap<String, String> hexToNameMap = new HashMap<>();
 
         void put(String name, EthAccount account){
             accounts.put(name, account);
             hexToAccountMap.put(account.getAddress().toString(), account);
+            hexToNameMap.put(account.getAddress().toString(), name);
         }
 
         boolean containsKey(String name){
@@ -164,8 +170,12 @@ public class AccountsManager {
             return accounts.values();
         }
 
-        EthAccount getByHexString(String hexString){
+        EthAccount getAccountByHexString(String hexString){
             return hexToAccountMap.get(hexString);
+        }
+
+        String getNameByHexString(String hexString){
+            return hexToNameMap.get(hexString);
         }
     }
 }

@@ -14,7 +14,7 @@ import static org.adridadou.ethereum.values.EthValue.ether;
 
 public class CustomTest {
 
-    private static boolean DEVEL_PHASE = false;
+    static boolean DEVEL_PHASE = false;
 
     private static EventHandler<Minted> mintedEventHandler = new EventHandler<>();
     private static EventHandler<Sent> sentEventHandler = new EventHandler<>();

@@ -24,6 +24,7 @@ public class AddAccount extends CLICommand {
         String name = parsedCommandLine.args.get(0);
         try {
             accountsManager.addToAccounts(name);
+            System.out.println("Warning: this is a brand new account with 0 ether balance. Inform the main account to sent this new user some resources.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
