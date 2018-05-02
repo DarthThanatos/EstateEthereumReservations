@@ -22,4 +22,7 @@ public interface Reservations {
 
     CompletableFuture<Void> tryToChangeAvailableDay(int estateLocalIndex, int day, boolean available);
     CompletableFuture<Boolean> checkPaidForReservation(EthAccount estateOwner, int estateIndex, int day);
+
+    CompletableFuture<Integer> getRemainingQuote(EthAccount estateOwner, int estateLocalIndex, int day);
+    CompletableFuture<Integer> getRemainingQuoteGlobal(int globalIndex, int day);
 }

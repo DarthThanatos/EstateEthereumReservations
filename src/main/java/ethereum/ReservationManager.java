@@ -177,11 +177,20 @@ public class ReservationManager {
             boolean atLeastOneTrue = false;
             for (int i = 0; i < 7; i++) {
                 if (estate.getDaysReservationStates()[i]) {
-                    stringBuilder.append(days[i]).append(":").append(
-                            owner != null
-                            ? accountsManager.getReadableNameFromHexForm(reservations.getTenantOfOwner(owner, index, i))
-                            : accountsManager.getReadableNameFromHexForm(reservations.getTenant(index, i))
-                    ).append(" ");
+                    try {
+                        stringBuilder.append(days[i]).append(":").append(
+                                owner != null
+                                ? accountsManager.getReadableNameFromHexForm(reservations.getTenantOfOwner(owner, index, i))
+                                : accountsManager.getReadableNameFromHexForm(reservations.getTenant(index, i))
+                        ).append(" [toPay=").append(
+                                owner != null
+                                        ? reservations.getRemainingQuote(owner, index, i).get()
+                                        : reservations.getRemainingQuoteGlobal(index, i).get()
+
+                        ).append("]");
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
                     atLeastOneTrue = true;
                 }
             }

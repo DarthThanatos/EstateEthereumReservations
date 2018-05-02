@@ -47,8 +47,12 @@ contract Reservations {
         PublishedEstate(estatesOwnerAddressString, name, price, daysAvailabilityStates);
     }
 
-    function getRemaningQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){
+    function getRemainingQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){
         return estatesByOwner[estateOwner][estateLocalIndex].price - estatesByOwner[estateOwner][estateLocalIndex].alreadyPaidAmount[day];
+    }
+
+    function getRemainingQuoteGlobal(uint globalIndex, uint day) public returns(uint){
+        return allEstates[globalIndex].price - allEstates[globalIndex].alreadyPaidAmount[day];
     }
 
     function payForDay(address estateOwner, uint estateLocalIndex, uint day, uint amount) public{

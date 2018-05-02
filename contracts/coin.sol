@@ -2,7 +2,7 @@ pragma solidity ^0.4.0;
 
 contract Reservations{
     function payForDay(address estateOwner, uint estateLocalIndex, uint day, uint amount) public {}
-    function getRemaningQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){}
+    function getRemainingQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){}
     function isDayReserved(address estateOwner, uint estateLocalIndex, uint day) public returns(bool){}
 }
 
@@ -51,7 +51,7 @@ contract Coin {
 
     function payForReservation(address estateOwner, uint estateLocalIndex, uint amount, uint day, address reservationsAddr){
         Reservations reservations = Reservations(reservationsAddr);
-        uint amountLeft =  reservations.getRemaningQuote(estateOwner, estateLocalIndex, day);
+        uint amountLeft =  reservations.getRemainingQuote(estateOwner, estateLocalIndex, day);
         uint amountToSend = min(amountLeft, amount);
         if(!reservations.isDayReserved(estateOwner, estateLocalIndex, day)) return;
         if (balances[msg.sender] < amountToSend) return;

@@ -17,8 +17,8 @@ public class ParsedCommandLine{
         if(empty) {
             return this;
         }
-        command = parts[0];
-        args = Arrays.stream(parts).skip(1).collect(Collectors.toList());
+        command = parts[0].trim();
+        args = Arrays.stream(parts).skip(1).map(String::trim).collect(Collectors.toList());
         return this;
     }
 }
