@@ -3,14 +3,18 @@ package ethereum;
 import event.EventHandler;
 import event.SolEvent;
 import interfaces.Reservations;
+import io.reactivex.schedulers.Schedulers;
 import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.values.EthAccount;
-import rx.Observable;
+import io.reactivex.Observable;
+import org.adridadou.ethereum.values.EthAddress;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class ReservationManager {
 
@@ -18,24 +22,110 @@ public class ReservationManager {
 
     private ContractPublisher.Contract<Reservations> mainContract;
     private HashMap<String, Reservations> reservations = new HashMap<>();
+    private AccountsManager accountsManager;
 
     ReservationManager(EthereumFacade ethereum, ContractPublisher.Contract<Reservations> mainContract, AccountsManager accountsManager){
         this.ethereum = ethereum;
         this.mainContract = mainContract;
+        this.accountsManager = accountsManager;
         observeEvents(accountsManager);
+    }
+
+
+    EthAddress getReservationsContractAddr(){
+        return mainContract.contractAddress;
     }
 
     private void observeEvents(AccountsManager accountsManager){
         observeEvent(accountsManager, "PublishedEstate", PublishedEstate.class);
-        observeEvent(accountsManager, "ReservationMade", ReservationMade.class);
-        observeEvent(accountsManager, "ReservationCanceled", ReservationCanceled.class);
+        observeEvent(accountsManager, "ReservationMade", ReservationMade.class, this::handleReservation);
+        observeEvent(accountsManager, "ReservationCanceled", ReservationCanceled.class, this::handleCancel);
     }
 
+
+    class ReservationDetails{
+        final String owner;
+        final int estateIndex;
+        final int day;
+
+        ReservationDetails(String owner, int estateIndex, int day){
+          this.owner = owner;
+          this.estateIndex = estateIndex;
+          this.day = day;
+        }
+        public int hashCode(){
+            int hashcode;
+            hashcode = day * 20;
+            hashcode += estateIndex * 40;
+            hashcode += owner.hashCode();
+            return hashcode;
+        }
+
+        public boolean equals(Object obj){
+            if (obj instanceof ReservationDetails) {
+                ReservationDetails pp = (ReservationDetails) obj;
+                return (pp.owner.equals(this.owner) && pp.estateIndex == this.estateIndex && pp.day == this.day);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private HashMap<ReservationDetails, Boolean> reservationActiveMap = new HashMap<>();
+
+
+    private void handleReservation(ReservationMade reservationMade){
+        ReservationDetails reservationDetails = new ReservationDetails(reservationMade.estateOwnerAddressString, reservationMade.estateIndex, reservationMade.day);
+        reservationActiveMap.put(reservationDetails, true);
+        Observable.interval(30, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).forEachWhile(
+                aLong -> shouldStopObservingReservation(aLong, reservationDetails),
+                Throwable::printStackTrace
+        );
+    }
+
+    @SuppressWarnings("unused")
+    private boolean shouldStopObservingReservation(long l, ReservationDetails reservationDetails){
+
+        System.out.println("checking if reservation is active and paid: account: "
+                + accountsManager.getReadableNameFromHexForm(reservationDetails.owner)
+                + " estate index: " + reservationDetails.estateIndex
+                + " day: " + reservationDetails.day
+        );
+
+        boolean paid = false;
+        try {
+            paid = accountsManager.getReservationsForName("main")
+                    .checkPaidForReservation(
+                            accountsManager.getAcountFromHex(reservationDetails.owner),
+                            reservationDetails.estateIndex,
+                            reservationDetails.day
+                    ).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        boolean reservationActive = reservationActiveMap.get(reservationDetails);
+
+        System.out.println("Paid: " + paid + "; reservation active: " + reservationActive);
+        return reservationActive && paid;
+    }
+
+    private void handleCancel(ReservationCanceled reservationCanceled){
+        reservationActiveMap.put(new ReservationDetails(reservationCanceled.estateOwnerAddressString, reservationCanceled.estateIndex, reservationCanceled.day), false);
+    }
+
+    @SuppressWarnings("SameParameterValue")
     private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass){
+        observeEvent(accountsManager, eventName, eventClass, null);
+    }
+
+    private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass, EventHandler.NonDefaultEventHandler<T> nonDefaultEventHandler){
         EventHandler<T> eventHandler = new EventHandler<>(accountsManager);
-        Observable<T> event =
-                ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, eventName, eventClass);
-        event.subscribe(eventHandler::handle, Throwable::printStackTrace);
+        rx.Observable<T> event = ethereum.observeEvents(mainContract.compiledContract.getAbi(), mainContract.contractAddress, eventName, eventClass);
+        event.subscribe(
+                e -> eventHandler.handle(e, nonDefaultEventHandler),
+                Throwable::printStackTrace
+        );
 
     }
 
@@ -132,6 +222,7 @@ public class ReservationManager {
             this.clientAddrString = clientAddrString;
             this.day = day;
         }
+
 
         @Override public String toString(){
             String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};

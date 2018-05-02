@@ -1,5 +1,11 @@
 pragma solidity ^0.4.0;
 
+contract Reservations{
+    function payForDay(address estateOwner, uint estateLocalIndex, uint day, uint amount) public {}
+    function getRemaningQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){}
+    function isDayReserved(address estateOwner, uint estateLocalIndex, uint day) public returns(bool){}
+}
+
 contract Coin {
 
     // The keyword "public" makes those variables
@@ -41,6 +47,20 @@ contract Coin {
         uint cur_src_balnce = balances[msg.sender];
         uint cur_target_balance = balances[receiver];
         Sent(toString(msg.sender), toString(receiver), amount, prev_src_balance, cur_src_balnce, prev_target_balance, cur_target_balance);
+    }
+
+    function payForReservation(address estateOwner, uint estateLocalIndex, uint amount, uint day, address reservationsAddr){
+        Reservations reservations = Reservations(reservationsAddr);
+        uint amountLeft =  reservations.getRemaningQuote(estateOwner, estateLocalIndex, day);
+        uint amountToSend = min(amountLeft, amount);
+        if(!reservations.isDayReserved(estateOwner, estateLocalIndex, day)) return;
+        if (balances[msg.sender] < amountToSend) return;
+        send(estateOwner, amountToSend);
+        reservations.payForDay(estateOwner, estateLocalIndex, day, amountToSend);
+    }
+
+    function min(uint a, uint b) private returns (uint) {
+        return a < b ? a : b;
     }
 
     function toString(address x) returns (string) {

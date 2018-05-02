@@ -3,7 +3,6 @@ package event;
 import main.Main;
 import ethereum.AccountsManager;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class EventHandler <T extends SolEvent>{
@@ -15,30 +14,39 @@ public class EventHandler <T extends SolEvent>{
         this.accountsManager = accountsManager;
     }
 
-    public void handle(T event){
+    public void handle(T event, NonDefaultEventHandler<T> nonDefaultEventHandler){
         Object[] translatedAdresses =
                 event.addressesToTranslate().stream()
                         .map(s -> accountsManager.getReadableNameFromHexForm(s)).collect(Collectors.toList()).toArray();
         if(Main.DEVEL_PHASE){
             if(i == 0) {
-                System.out.println(
-                        String.format(
-                                event.toString(),
-                                translatedAdresses
-                        )
-                );
+                act(event, nonDefaultEventHandler,translatedAdresses);
                 i = 1;
             }
             else i = 0;
 
         }
-        else{
-            System.out.println(
-                    String.format(
-                            event.toString(),
-                            translatedAdresses
-                    )
-            );
-        }
+        else act(event, nonDefaultEventHandler,translatedAdresses);
+    }
+
+
+    public void handle(T event){
+        handle(event, null);
+    }
+
+    private void act(T event, NonDefaultEventHandler<T> nonDefaultEventHandler, Object[] translatedAdresses){
+
+        System.out.println(
+                String.format(
+                        event.toString(),
+                        translatedAdresses
+                )
+        );
+
+        if(nonDefaultEventHandler != null) nonDefaultEventHandler.handle(event);
+    }
+
+    public interface NonDefaultEventHandler<T extends SolEvent>{
+        void handle(T event);
     }
 }

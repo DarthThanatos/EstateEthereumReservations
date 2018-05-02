@@ -1,5 +1,6 @@
 pragma solidity ^0.4.0;
 
+
 contract Reservations {
 
     address contractOwner;
@@ -10,7 +11,7 @@ contract Reservations {
         uint price;
         bool[] daysAvailabilityStates;
         bool[] daysReservationStates;
-        bool[] paidForDayReservation;
+        uint[] alreadyPaidAmount;
         string[] tenantAddressesStrings;
         uint globalIndex;
     }
@@ -31,20 +32,52 @@ contract Reservations {
         address estatesOwner = msg.sender;
 
         string[] memory tenantAddressesStrings =  new string[](7);
-        bool[] memory paidForDayReservation = new bool[](7);
+        uint[] memory alreadyPaidAmount = new uint[](7);
         for(uint i = 0; i < 7; i++) {
             tenantAddressesStrings[i] = "";
-            paidForDayReservation[i] = false;
+            alreadyPaidAmount[i] = 0;
         }
 
         string memory estatesOwnerAddressString = toString(estatesOwner);
-        Estate memory estate = Estate(estatesOwnerAddressString, name, price, daysAvailabilityStates, daysReservationStates, paidForDayReservation, tenantAddressesStrings, allEstates.length);
+        uint alreadyPaid = 0;
+        Estate memory estate = Estate(estatesOwnerAddressString, name, price, daysAvailabilityStates, daysReservationStates, alreadyPaidAmount, tenantAddressesStrings, allEstates.length);
         estatesByOwner[estatesOwner].push(estate);
         allEstates.push(estate);
 
         PublishedEstate(estatesOwnerAddressString, name, price, daysAvailabilityStates);
     }
 
+    function getRemaningQuote(address estateOwner, uint estateLocalIndex, uint day) public returns(uint){
+        return estatesByOwner[estateOwner][estateLocalIndex].price - estatesByOwner[estateOwner][estateLocalIndex].alreadyPaidAmount[day];
+    }
+
+    function payForDay(address estateOwner, uint estateLocalIndex, uint day, uint amount) public{
+        Estate estate = estatesByOwner[estateOwner][estateLocalIndex];
+        estate.alreadyPaidAmount[day] += amount;
+        allEstates[estate.globalIndex].alreadyPaidAmount[day] += amount;
+    }
+
+    function isDayReserved(address estateOwner, uint estateLocalIndex, uint day) public returns(bool){
+        return estatesByOwner[estateOwner][estateLocalIndex].daysReservationStates[day];
+    }
+
+    function checkPaidForReservation(address estateOwner, uint estateIndex, uint day) public returns(bool paid){
+        Estate estate = estatesByOwner[estateOwner][estateIndex];
+        paid = estate.alreadyPaidAmount[day] == estate.price;
+        if(!paid){
+            string tenant = estate.tenantAddressesStrings[day];
+
+            estate.daysReservationStates[day] = false;
+            estate.tenantAddressesStrings[day] = "";
+
+            allEstates[estate.globalIndex].daysReservationStates[day] = false;
+            allEstates[estate.globalIndex].tenantAddressesStrings[day] = "";
+
+            ReservationCanceled(toString(estateOwner), estateIndex, estate.name, tenant, day);
+        }
+        estate.alreadyPaidAmount[day] = 0;
+        allEstates[estate.globalIndex].alreadyPaidAmount[day] = 0;
+    }
 
     function tryToChangeAvailableDay(uint estateLocalIndex, uint day, bool available) public{
         Estate estate = estatesByOwner[msg.sender][estateLocalIndex];

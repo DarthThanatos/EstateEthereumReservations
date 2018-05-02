@@ -21,4 +21,5 @@ public interface Reservations {
     String getTenant(int estateIndex, int day);
 
     CompletableFuture<Void> tryToChangeAvailableDay(int estateLocalIndex, int day, boolean available);
+    CompletableFuture<Boolean> checkPaidForReservation(EthAccount estateOwner, int estateIndex, int day);
 }

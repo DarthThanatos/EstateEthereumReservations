@@ -6,6 +6,7 @@ import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.blockchain.TestConfig;
 import org.adridadou.ethereum.keystore.AccountProvider;
 import org.adridadou.ethereum.values.EthAccount;
+import org.adridadou.ethereum.values.EthAddress;
 import org.adridadou.ethereum.values.EthValue;
 
 import java.util.Collection;
@@ -50,7 +51,10 @@ public class AccountsManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    public EthAddress getReservationsAddr(){
+        return reservationManager.getReservationsContractAddr();
     }
 
     public void createStartingAccounts(){
@@ -143,6 +147,7 @@ public class AccountsManager {
     public String getReadableNameFromHexForm(String hexForm){
         return accounts.getNameByHexString(hexForm);
     }
+    EthAccount getAcountFromHex(String hexForm) {return accounts.getAccountByHexString(hexForm);}
 
     private class AccountsMappings {
 

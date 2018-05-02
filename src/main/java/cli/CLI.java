@@ -3,12 +3,14 @@ package cli;
 import ethereum.AccountsManager;
 import commands.CLICommand;
 import commands.ParsedCommandLine;
+import jline.console.ConsoleReader;
 import org.adridadou.ethereum.EthereumFacade;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Set;
 
 public abstract class CLI {
 
@@ -29,7 +31,6 @@ public abstract class CLI {
     public void mainLoop(){
         shouldContinue = true;
         while(shouldContinue){
-            System.out.print(getPrompt());
             ParsedCommandLine parsedCommandLine = readAndParseLine();
             onParsedCommandLine(parsedCommandLine);
         }
@@ -51,6 +52,24 @@ public abstract class CLI {
 
     private ParsedCommandLine readAndParseLine(){
         try {
+            ConsoleReader console = new ConsoleReader();
+            console.setPrompt(getPrompt());
+
+            Set<String> strings = getCommands().keySet();
+            console.addCompleter(new StringsCompleter(strings.toArray(new String[strings.size()])));
+            String commandLine = console.readLine();
+
+
+            return new ParsedCommandLine().parse(commandLine.trim());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private ParsedCommandLine readAndParseLine_(){
+        try {
+            System.out.print(getPrompt());
             String commandLine = commandsReader.readLine();
             return new ParsedCommandLine().parse(commandLine.trim());
         } catch (IOException e) {

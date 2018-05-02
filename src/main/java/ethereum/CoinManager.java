@@ -5,6 +5,7 @@ import event.SolEvent;
 import interfaces.Coin;
 import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.values.EthAccount;
+import org.adridadou.ethereum.values.EthAddress;
 import rx.Observable;
 
 import java.util.Arrays;
@@ -26,6 +27,10 @@ class CoinManager {
         observeEvents(accountsManager);
     }
 
+    EthAddress getCoinContractAddr(){
+        return mainContract.contractAddress;
+    }
+
     private void observeEvents(AccountsManager accountsManager){
         observeEvent(accountsManager, "Sent", Sent.class);
         observeEvent(accountsManager, "Minted", Minted.class);
@@ -38,13 +43,12 @@ class CoinManager {
         event.subscribe(eventHandler::handle, Throwable::printStackTrace);
     }
 
+    @SuppressWarnings("EmptyCatchBlock")
     void printUserCustomCurrencyBalance(EthAccount account, String name)  {
         Coin coin = getCoinForName(account, name);
         try {
             System.out.println("Balance of " + name + " in custom currency: " + coin.getBalance(account).get());
-        } catch (InterruptedException | ExecutionException e) {
-//            e.printStackTrace();
-        }
+        } catch (InterruptedException | ExecutionException e) { }
     }
 
     Coin getCoinForName(EthAccount account, String name){

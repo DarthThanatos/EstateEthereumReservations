@@ -32,7 +32,7 @@ public class ChangeAvailabilityStatusCommand extends CLICommand {
 
     private void tryToChangeAvailabilityStatus(Reservations reservations, int estateIndex, int day, boolean isAvailable){
         try{
-            reservations.tryToChangeAvailableDay(estateIndex, day, isAvailable);
+            reservations.tryToChangeAvailableDay(estateIndex, day, isAvailable).get();
         }catch(Exception e){
             System.out.println(e.getMessage());
             System.out.println("No estate with the given properties");
