@@ -8,6 +8,7 @@ import org.adridadou.ethereum.values.EthAccount;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PayForReservationCommand extends CLICommand {
 
@@ -24,9 +25,18 @@ public class PayForReservationCommand extends CLICommand {
         EthAccount account;
         int estateIndex, amount, day;
         if(argcCorrect() && (account = getAccount()) != null && (estateIndex = getEstateIndex())!= -1 && (amount = getAmount())!= -1 && (day = getDay())!= -1){
-            Coin coin = accountsManager.getCoinForName(userCLI.getUserName());
-            coin.payForReservation(account, estateIndex, amount, day, accountsManager.getReservationsAddr());
+            payForReservation(account, estateIndex, amount, day);
         }
+    }
+
+    private void payForReservation(EthAccount account, int estateIndex, int amount, int day){
+        Coin coin = accountsManager.getCoinForName(userCLI.getUserName());
+        try {
+            coin.payForReservation(account, estateIndex, amount, day, accountsManager.getReservationsAddr()).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
