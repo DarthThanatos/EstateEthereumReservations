@@ -18,6 +18,7 @@ contract Reservations {
 
     event PublishedEstate(string estatesOwnerAddressString, string name, uint price, bool[]daysAvailabilityStates);
     event ReservationMade(string estateOwnerAddressString, uint estateIndex, string name, string clientAddrString, uint day);
+    event ReservationCanceled(string estateOwnerAddressString, uint estateIndex, string name, string clientAddrString, uint day);
 
     function Reservations() public {
         contractOwner = msg.sender;
@@ -72,9 +73,32 @@ contract Reservations {
 
     function tryToCancel(address estateOwner, uint estateIndex, uint day) public{
         address client = msg.sender;
+        if(estateOwner == client) return;
 
+        Estate estate = estatesByOwner[estateOwner][estateIndex];
+
+        if(day < 0 && day >= 7) return;
+        if(!estate.daysAvailabilityStates[day] || !estate.daysReservationStates[day]) return;
+
+        string memory clientStringAddr = toString(client);
+        string memory currentTenant = estate.tenantAddressesStrings[day];
+        if(!stringsEqual(currentTenant, clientStringAddr)) return;
+
+        estate.daysReservationStates[day] = false;
+        estate.tenantAddressesStrings[day] = "";
+
+        ReservationCanceled(
+            toString(estateOwner),
+            estateIndex,
+            estatesByOwner[estateOwner][estateIndex].name,
+            clientStringAddr,
+            day
+        );
     }
 
+    function stringsEqual (string a, string b) returns (bool){
+        return keccak256(a) == keccak256(b);
+    }
 
     function toString(address x) returns (string) {
         bytes memory s = new bytes(40);

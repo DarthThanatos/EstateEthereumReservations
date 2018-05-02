@@ -30,6 +30,7 @@ public class UserCLI extends CLI {
         commands.put("estate", new PrintEstateCommand(accountsManager, this));
         commands.put("ls", new ListAllEstatesCommand(accountsManager, this));
         commands.put("mr", new MakeReservationCommand(accountsManager, this));
+        commands.put("cr", new CancelReservationCommand(accountsManager, this));
         HelpCommand.addHelpToCommands(commands, this); //this needs to be called as the last one
 
         return commands;

@@ -28,7 +28,7 @@ public class ReservationManager {
     private void observeEvents(AccountsManager accountsManager){
         observeEvent(accountsManager, "PublishedEstate", PublishedEstate.class);
         observeEvent(accountsManager, "ReservationMade", ReservationMade.class);
-
+        observeEvent(accountsManager, "ReservationCanceled", ReservationCanceled.class);
     }
 
     private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass){
@@ -87,6 +87,38 @@ public class ReservationManager {
         @Override public String toString(){
             String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
             return "Reservation was made" +
+                    "\n\towner: " + estateOwnerAddressString + " ( %s ) " +
+                    "\n\testate index: " + estateIndex +
+                    "\n\testate name: " + name +
+                    "\n\ttenant: " + clientAddrString + " ( %s ) " +
+                    "\n\tday: " + days[day];
+        }
+
+        @Override
+        public List<String> addressesToTranslate() {
+            return Arrays.asList(estateOwnerAddressString, clientAddrString);
+        }
+    }
+
+    public static class ReservationCanceled extends SolEvent{
+
+        private String estateOwnerAddressString;
+        private int estateIndex;
+        private String name;
+        private String clientAddrString;
+        private int day;
+
+        public ReservationCanceled(String estateOwnerAddressString, int estateIndex, String name, String clientAddrString, int day){
+            this.estateOwnerAddressString = estateOwnerAddressString;
+            this.estateIndex = estateIndex;
+            this.name = name;
+            this.clientAddrString = clientAddrString;
+            this.day = day;
+        }
+
+        @Override public String toString(){
+            String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+            return "Reservation was canceled" +
                     "\n\towner: " + estateOwnerAddressString + " ( %s ) " +
                     "\n\testate index: " + estateIndex +
                     "\n\testate name: " + name +
