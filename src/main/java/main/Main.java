@@ -15,7 +15,7 @@ public class Main{
     private static final String CONFIG_FILE = "custom_genesis.json";
 
     private static final AccountsManager accountsManager = new AccountsManager();
-    private static final EthereumFacade ethereum = forNetwork();
+    private static final EthereumFacade ethereum = forTest();
 
     public static  void main(String[] args) throws Exception{
         new MainCLI(ethereum, accountsManager).mainLoop();

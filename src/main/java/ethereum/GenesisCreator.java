@@ -94,7 +94,7 @@ import java.util.HashMap;
             JSONObject alloc = new JSONObject();
             accountHashMap.values().forEach(
                     account -> alloc.put(
-                            account.key.getPrivKey().toString(),
+                            account.getAddress().toString(),
                             new JSONObject().put("balance","1606938044258990275541962092341162602522202993782792835301376")
                     )
             );
