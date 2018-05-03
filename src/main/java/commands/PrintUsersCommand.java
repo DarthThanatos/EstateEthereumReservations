@@ -6,8 +6,8 @@ import java.util.List;
 
 public class PrintUsersCommand extends PrintCommand {
 
-    public PrintUsersCommand(AccountsManager accountsManager) {
-        super(accountsManager);
+    public PrintUsersCommand(AccountsManager accountsManager, String cmdName) {
+        super(accountsManager, cmdName);
         printerOfAll = AccountsManager::printAccounts;
         printerOfOne = AccountsManager::printAccount;
     }

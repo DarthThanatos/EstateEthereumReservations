@@ -15,7 +15,8 @@ public class ChangeAvailabilityStatusCommand extends CLICommand {
     private UserCLI userCLI;
 
 
-    public ChangeAvailabilityStatusCommand(AccountsManager accountsManager, UserCLI userCLI){
+    public ChangeAvailabilityStatusCommand(AccountsManager accountsManager, UserCLI userCLI, String userName){
+        super(userName);
         this.accountsManager = accountsManager;
         this.userCLI = userCLI;
     }
@@ -23,7 +24,7 @@ public class ChangeAvailabilityStatusCommand extends CLICommand {
     @Override
     public void execute() {
         int day, estateIndex;
-        if(argcCorrect() && (estateIndex = getEstateIndex()) != -1 &&(day = getDay()) != -1){
+        if(argcCorrect(3) && (estateIndex = getInt(0)) != -1 &&(day = getDay(1)) != -1){
             boolean isAvailable = isAvailable();
             Reservations reservations = accountsManager.getReservationsForName(userCLI.getUserName());
             tryToChangeAvailabilityStatus(reservations, estateIndex, day, isAvailable);
@@ -54,39 +55,9 @@ public class ChangeAvailabilityStatusCommand extends CLICommand {
         return "Changes availability status of a given day of a given estate.";
     }
 
-    private boolean argcCorrect(){
-        if(parsedCommandLine.args.size() < 3){
-            System.out.println("Invalid usage, check help command for details");
-            return false;
-        }
-        return true;
-    }
-
-
-    private int getDay(){
-        int day = getInt(1);
-        if(day < 0 || day > 6){
-            System.out.println("Day needs to be in range [0,6]");
-            return -1;
-        }
-        return day;
-    }
-
-    private int getInt(int index){
-        try{
-            return Integer.parseInt(parsedCommandLine.args.get(index));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid integer at " + index);
-            return -1;
-        }
-    }
-
     private boolean isAvailable(){
         int flagIndex = 2;
         return Objects.equals(parsedCommandLine.args.get(flagIndex), "t");
     }
 
-    private int getEstateIndex(){
-        return getInt(0);
-    }
 }

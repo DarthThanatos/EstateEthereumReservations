@@ -20,19 +20,19 @@ public class UserCLI extends CLI {
         if(commands != null) return commands;
 
         commands = new HashMap<>();
-        commands.put("logout", new StopCommand(this));
-        commands.put("mint", new MintCustomCurrencyCommand(accountsManager, this));
-        commands.put("se", new SendEtherCommand(accountsManager, ethereum, this));
-        commands.put("pc", new PayCustomCurrencyCommand(accountsManager, this));
-        commands.put("eb", new PrintEtherBalanceCommand(accountsManager));
-        commands.put("ccb", new PrintCustomCurrencyBalanceCommand(accountsManager));
-        commands.put("pub", new PublishEstateCommand(accountsManager, this));
-        commands.put("estate", new PrintEstateCommand(accountsManager, this));
-        commands.put("ls", new ListAllEstatesCommand(accountsManager, this));
-        commands.put("mr", new MakeReservationCommand(accountsManager, this));
-        commands.put("cr", new CancelReservationCommand(accountsManager, this));
-        commands.put("ca", new ChangeAvailabilityStatusCommand(accountsManager, this));
-        commands.put("pfr", new PayForReservationCommand(accountsManager, this));
+        commands.put("logout", new StopCommand(this, "logout"));
+        commands.put("mint", new MintCustomCurrencyCommand(accountsManager, this, "mint"));
+        commands.put("se", new SendEtherCommand(accountsManager, ethereum, this, "se"));
+        commands.put("pc", new PayCustomCurrencyCommand(accountsManager, this, "pc"));
+        commands.put("eb", new PrintEtherBalanceCommand(accountsManager, "eb"));
+        commands.put("ccb", new PrintCustomCurrencyBalanceCommand(accountsManager, "ccb"));
+        commands.put("pub", new PublishEstateCommand(accountsManager, this, "pub"));
+        commands.put("estate", new PrintEstateCommand(accountsManager, this, "estate"));
+        commands.put("ls", new ListAllEstatesCommand(accountsManager, this, "ls"));
+        commands.put("mr", new MakeReservationCommand(accountsManager, this, "mr"));
+        commands.put("cr", new CancelReservationCommand(accountsManager, this, "cr"));
+        commands.put("ca", new ChangeAvailabilityStatusCommand(accountsManager, this, "ca"));
+        commands.put("pfr", new PayForReservationCommand(accountsManager, this, "pfr"));
         HelpCommand.addHelpToCommands(commands, this); //this needs to be called as the last one
 
         return commands;

@@ -20,7 +20,8 @@ public abstract class PrintCommand extends CLICommand {
     PrinterOfAll printerOfAll;
     PrinterOfOne printerOfOne;
 
-    PrintCommand(AccountsManager accountsManager){
+    PrintCommand(AccountsManager accountsManager, String cmdName){
+        super(cmdName);
         this.accountsManager = accountsManager;
     }
 

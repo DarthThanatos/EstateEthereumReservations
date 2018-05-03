@@ -15,7 +15,8 @@ public abstract class ReservationCommand extends CLICommand{
     AccountsManager accountsManager;
     private UserCLI userCLI;
 
-    ReservationCommand(AccountsManager accountsManager, UserCLI userCLI){
+    ReservationCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName){
+        super(cmdName);
         this.accountsManager = accountsManager;
         this.userCLI = userCLI;
     }
@@ -29,7 +30,7 @@ public abstract class ReservationCommand extends CLICommand{
         int index;
         int day;
 
-        if(argcCorrect() && (account = getAccount()) != null && (index = getIndex())!= -1 && (day = getDay())!= -1){
+        if(argcCorrect(3) && (account = getAccount(accountsManager, 0)) != null && (index = getInt(1))!= -1 && (day = getDay(2))!= -1){
             onArgumentsCorrect(account, index, day);
         }
     }
@@ -44,6 +45,7 @@ public abstract class ReservationCommand extends CLICommand{
         return new ArrayList<>();
     }
 
+
     private void onArgumentsCorrect(EthAccount account, int index, int day){
         Reservations reservationForName = accountsManager.getReservationsForName(userCLI.getUserName());
         try{
@@ -54,42 +56,4 @@ public abstract class ReservationCommand extends CLICommand{
         }
     }
 
-    private boolean argcCorrect(){
-        if(parsedCommandLine.args.size() < 3){
-            System.out.println("Invalid usage, check help command for details");
-            return false;
-        }
-        return true;
-    }
-
-    private EthAccount getAccount(){
-        String estateOwnerName = parsedCommandLine.args.get(0);
-        EthAccount account = accountsManager.getAccount(estateOwnerName);
-        if(account == null){
-            System.out.println("There is no user with such a name");
-        }
-        return  account;
-    }
-
-    private int getIndex(){
-        return getInt(1);
-    }
-
-    private int getDay(){
-        int day = getInt(2);
-        if(day < 0 || day > 6){
-            System.out.println("Day needs to be in range [0,6]");
-            return -1;
-        }
-        return day;
-    }
-
-    private int getInt(int argIndex){
-        try{
-            return Integer.parseInt(parsedCommandLine.args.get(argIndex));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid integer at " + argIndex);
-            return -1;
-        }
-    }
 }

@@ -9,8 +9,8 @@ public class MintCustomCurrencyCommand extends TargetedCommandWithAmount {
 
     private UserCLI userCLI;
 
-    public MintCustomCurrencyCommand(AccountsManager accountsManager, UserCLI userCLI){
-        super(accountsManager);
+    public MintCustomCurrencyCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName){
+        super(accountsManager, cmdName);
         this.userCLI = userCLI;
     }
 

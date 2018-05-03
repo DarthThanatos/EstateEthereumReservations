@@ -8,12 +8,13 @@ public class HelpCommand extends CLICommand {
     private String helpText;
     private CLI cli;
 
-    private HelpCommand(CLI cli){
+    private HelpCommand(CLI cli, String cmdName){
+        super(cmdName);
         this.cli = cli;
     }
 
     public static void addHelpToCommands(HashMap<String, CLICommand> commands, CLI cli){
-        HelpCommand helpCommand = new HelpCommand(cli);
+        HelpCommand helpCommand = new HelpCommand(cli, "help");
         commands.put("help", helpCommand);
         helpCommand.calculateHelpText(commands);
         // ^ we need to pass commands here, as it may not be complete yet, and to avoid infinite recursion, as cli.getCommands may call this function
@@ -27,7 +28,7 @@ public class HelpCommand extends CLICommand {
         }
     }
 
-    private String calculateCommandHelpText(String commandName, CLICommand cliCommand){
+    static String calculateCommandHelpText(String commandName, CLICommand cliCommand){
         List<String> requiredArgumentNamesList = cliCommand.getRequiredArgumentsList();
         List<String> optionalArgumentNamesList = cliCommand.getOptionalArgumentsList();
 

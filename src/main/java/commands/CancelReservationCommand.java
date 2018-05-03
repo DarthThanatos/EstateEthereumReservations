@@ -7,8 +7,8 @@ import org.adridadou.ethereum.values.EthAccount;
 
 public class CancelReservationCommand extends ReservationCommand {
 
-    public CancelReservationCommand(AccountsManager accountsManager, UserCLI userCLI) {
-        super(accountsManager, userCLI);
+    public CancelReservationCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName) {
+        super(accountsManager, userCLI, cmdName);
     }
 
     @Override

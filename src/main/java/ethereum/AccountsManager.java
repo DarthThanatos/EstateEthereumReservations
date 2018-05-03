@@ -37,7 +37,9 @@ public class AccountsManager {
 
     private void initCoinManager(ContractPublisher contractPublisher, EthAccount mainAccount){
         try {
+            System.err.println("Publishing coin contract");
             ContractPublisher.Contract<Coin> mainContract = contractPublisher.compileAndPublish("coin.sol", "Coin", mainAccount ,Coin.class);
+            System.err.println("Published coin contract");
             coinManager = new CoinManager(ethereum, mainContract, this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +48,9 @@ public class AccountsManager {
 
     private void initReservationManager(ContractPublisher contractPublisher, EthAccount mainAccount){
         try {
+            System.err.println("Publishing reservations contract");
             ContractPublisher.Contract<Reservations> mainContract = contractPublisher.compileAndPublish("reservations.sol", "Reservations", mainAccount , Reservations.class);
+            System.err.println("Published reservations contract");
             reservationManager = new ReservationManager(ethereum, mainContract, this);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,10 +61,11 @@ public class AccountsManager {
         return reservationManager.getReservationsContractAddr();
     }
 
-    public void createStartingAccounts(){
+    public void createStartingAccounts(String configPath){
         accounts.put("bob",AccountProvider.from("bob"));
         accounts.put("alice", AccountProvider.from("alice"));
         accounts.put("main", AccountProvider.from("main"));
+        new GenesisCreator(accounts.accounts, configPath);
     }
 
     public TestConfig createTestAccountsConfig(){

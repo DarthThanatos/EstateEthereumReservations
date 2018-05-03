@@ -19,12 +19,12 @@ public class MainCLI extends CLI {
         if(commands != null) return commands;
 
         commands = new HashMap<>();
-        commands.put("exit", new ExitCommand(ethereum));
-        commands.put("logas", new UserConsoleCommand(ethereum, accountsManager));
-        commands.put("eb", new PrintEtherBalanceCommand(accountsManager));
-        commands.put("ccb", new PrintCustomCurrencyBalanceCommand(accountsManager));
-        commands.put("users", new PrintUsersCommand(accountsManager));
-        commands.put("add", new AddAccount(accountsManager));
+        commands.put("exit", new ExitCommand(ethereum, "exit"));
+        commands.put("logas", new UserConsoleCommand(ethereum, accountsManager, "logas"));
+        commands.put("eb", new PrintEtherBalanceCommand(accountsManager,"eb"));
+        commands.put("ccb", new PrintCustomCurrencyBalanceCommand(accountsManager, "ccb"));
+        commands.put("users", new PrintUsersCommand(accountsManager, "users"));
+        commands.put("add", new AddAccount(accountsManager,"add"));
         HelpCommand.addHelpToCommands(commands, this); //this needs to be called as the last one
 
         return commands;

@@ -10,25 +10,19 @@ public class AddAccount extends CLICommand {
 
     private AccountsManager accountsManager;
 
-    public AddAccount(AccountsManager accountsManager){
+    public AddAccount(AccountsManager accountsManager, String cmdName) {
+        super(cmdName);
         this.accountsManager = accountsManager;
     }
 
     @Override
     public void execute() {
-        if(argcCorrect()) {
+        if(argcCorrect(1)) {
             String name = parsedCommandLine.args.get(0);
             tryToAddAccount(name);
         }
     }
 
-    private boolean argcCorrect(){
-        if(parsedCommandLine.args.size() == 0){
-            System.out.println("This command takes a name of a new user as an argument. Note that this name must be unique.");
-            return false;
-        }
-        return true;
-    }
 
     private void tryToAddAccount(String name){
         try {

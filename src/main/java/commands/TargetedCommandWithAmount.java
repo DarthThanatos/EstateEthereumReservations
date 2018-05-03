@@ -1,7 +1,6 @@
 package commands;
 
 import ethereum.AccountsManager;
-import org.adridadou.ethereum.values.EthAccount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +10,8 @@ public abstract class TargetedCommandWithAmount extends CLICommand {
 
     AccountsManager accountsManager;
 
-    TargetedCommandWithAmount(AccountsManager accountsManager){
+    TargetedCommandWithAmount(AccountsManager accountsManager, String cmdName){
+        super(cmdName);
         this.accountsManager = accountsManager;
     }
 
@@ -19,7 +19,7 @@ public abstract class TargetedCommandWithAmount extends CLICommand {
     public void execute() {
         String targetName;
         int amount;
-        if(argcCorrect() && (targetName = getTargetName()) != null && (amount = getAmount()) != -1)
+        if(argcCorrect(2) && (targetName = getName(accountsManager, 0)) != null && (amount = getInt(1)) != -1)
             onArgumentsCorrect(targetName, amount);
     }
 
@@ -35,31 +35,5 @@ public abstract class TargetedCommandWithAmount extends CLICommand {
 
     abstract void onArgumentsCorrect(String targetName, int amount);
 
-    private boolean argcCorrect(){
-        if(parsedCommandLine.args.size() < 2){
-            System.out.println("This command requires the userName of the target and the amount you wish to be minted");
-            return false;
-        }
-        return true;
-    }
-
-    private String getTargetName(){
-        String targetName = parsedCommandLine.args.get(0);
-        EthAccount targetAccount = accountsManager.getAccount(targetName);
-        if(targetAccount == null) {
-            System.out.println("Error: target does not exist!");
-            return null;
-        }
-        return targetName;
-    }
-
-    private int getAmount(){
-        try{
-            return Integer.parseInt(parsedCommandLine.args.get(1));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid amount");
-            return -1;
-        }
-    }
 
 }

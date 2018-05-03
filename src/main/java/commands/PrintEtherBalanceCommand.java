@@ -7,8 +7,8 @@ import java.util.List;
 
 public class PrintEtherBalanceCommand extends PrintCommand {
 
-    public PrintEtherBalanceCommand(AccountsManager accountsManager) {
-        super(accountsManager);
+    public PrintEtherBalanceCommand(AccountsManager accountsManager, String cmdName) {
+        super(accountsManager, cmdName);
         printerOfAll = AccountsManager::printEthereumBalances;
         printerOfOne = AccountsManager::printUserEthereumBalance;
     }

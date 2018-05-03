@@ -1,5 +1,6 @@
 package event;
 
+import cli.CLI;
 import main.Main;
 import ethereum.AccountsManager;
 
@@ -42,7 +43,7 @@ public class EventHandler <T extends SolEvent>{
                         translatedAdresses
                 )
         );
-
+        System.out.println(CLI.CURRENT_PROMPT);
         if(nonDefaultEventHandler != null) nonDefaultEventHandler.handle(event);
     }
 

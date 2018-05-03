@@ -3,13 +3,16 @@ package main;
 import cli.MainCLI;
 import ethereum.AccountsManager;
 import org.adridadou.ethereum.EthereumFacade;
+import org.adridadou.ethereum.blockchain.BlockchainConfig;
 import org.adridadou.ethereum.provider.EthereumFacadeProvider;
 import org.adridadou.ethereum.provider.EthereumJConfigs;
+import org.adridadou.ethereum.values.config.GenesisPath;
 
 
-public class Main {
+public class Main{
 
     public static boolean DEVEL_PHASE = false;
+    private static final String CONFIG_FILE = "out.json";
 
     private static final AccountsManager accountsManager = new AccountsManager();
     private static final EthereumFacade ethereum = forTest();
@@ -20,17 +23,27 @@ public class Main {
 
     private static EthereumFacade forTest(){
         DEVEL_PHASE = true;
-        accountsManager.createStartingAccounts();
+        accountsManager.createStartingAccounts(CONFIG_FILE);
         EthereumFacade ethereum = EthereumFacadeProvider.forTest(accountsManager.createTestAccountsConfig());
         accountsManager.setEthereum(ethereum);
         return ethereum;
     }
 
+
     private static EthereumFacade forNetwork(){
+        System.err.println("Before for network");
         DEVEL_PHASE = false;
-        accountsManager.createStartingAccounts();
-        EthereumFacade ethereum = EthereumFacadeProvider.forNetwork(EthereumJConfigs.etherCampTestnet()).create();
+        accountsManager.createStartingAccounts(CONFIG_FILE);
+        EthereumFacade ethereum = EthereumFacadeProvider.forNetwork(
+                networkCOnfig()
+        ).create();
         accountsManager.setEthereum(ethereum);
+        System.err.println("After for network");
         return ethereum;
     }
+
+    private static BlockchainConfig.Builder networkCOnfig() {
+        return EthereumJConfigs.privateMiner().genesis(GenesisPath.path("privgen.json")).peerDiscovery(true);
+    }
+
 }

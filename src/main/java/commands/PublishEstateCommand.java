@@ -14,7 +14,8 @@ public class PublishEstateCommand extends CLICommand {
     private AccountsManager accountsManager;
     private UserCLI userCLI;
 
-    public PublishEstateCommand(AccountsManager accountsManager, UserCLI userCLI){
+    public PublishEstateCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName){
+        super(cmdName);
         this.accountsManager = accountsManager;
         this.userCLI = userCLI;
     }
@@ -23,7 +24,7 @@ public class PublishEstateCommand extends CLICommand {
     public void execute() {
         int price;
         String estateName;
-        if(argcCorrect() && (price = getPrice())!= -1){
+        if(argcCorrect(2) && (price = getInt(1))!= -1){
             estateName = parsedCommandLine.args.get(0);
             publishEstate(estateName, price);
         }
@@ -51,23 +52,6 @@ public class PublishEstateCommand extends CLICommand {
             reservations.publishEstate(name, price, booleanArrayOf(true), booleanArrayOf(false)).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        }
-    }
-
-    private boolean argcCorrect(){
-        if(parsedCommandLine.args.size() < 2){
-            System.out.println("Invalid usage, check help command for details");
-            return false;
-        }
-        return true;
-    }
-
-    private int getPrice(){
-        try{
-            return Integer.parseInt(parsedCommandLine.args.get(1));
-        }catch(NumberFormatException e){
-            System.out.println("You need to specify a valid amount");
-            return -1;
         }
     }
 

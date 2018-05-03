@@ -10,8 +10,8 @@ public class PayCustomCurrencyCommand extends TargetedCommandWithAmount {
 
     private UserCLI userCLI;
 
-    public PayCustomCurrencyCommand(AccountsManager accountsManager, UserCLI userCLI) {
-        super(accountsManager);
+    public PayCustomCurrencyCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName) {
+        super(accountsManager, cmdName);
         this.userCLI = userCLI;
     }
 

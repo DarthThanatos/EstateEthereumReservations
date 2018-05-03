@@ -9,7 +9,8 @@ public class StopCommand extends CLICommand {
 
     private CLI cli;
 
-    public StopCommand(CLI cli){
+    public StopCommand(CLI cli, String cmdName){
+        super(cmdName);
         this.cli = cli;
     }
 

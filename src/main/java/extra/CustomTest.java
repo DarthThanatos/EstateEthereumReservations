@@ -21,6 +21,7 @@ public class CustomTest {
 
     private static EventHandler<Minted> mintedEventHandler = new EventHandler<>();
     private static EventHandler<Sent> sentEventHandler = new EventHandler<>();
+    private static final String CONFIG_FILE = "out.json";
 
     private static final AccountsManager accountsManager = new AccountsManager();
     private static final EthereumFacade ethereum = forTest();
@@ -33,7 +34,7 @@ public class CustomTest {
 
     private static EthereumFacade forTest(){
         DEVEL_PHASE = true;
-        accountsManager.createStartingAccounts();
+        accountsManager.createStartingAccounts(CONFIG_FILE);
         EthereumFacade ethereum = EthereumFacadeProvider.forTest(accountsManager.createTestAccountsConfig());
         accountsManager.setEthereum(ethereum);
         return ethereum;
@@ -41,7 +42,7 @@ public class CustomTest {
 
     private static EthereumFacade forNetwork(){
         DEVEL_PHASE = false;
-        accountsManager.createStartingAccounts();
+        accountsManager.createStartingAccounts(CONFIG_FILE);
         EthereumFacade ethereum = EthereumFacadeProvider.forNetwork(EthereumJConfigs.etherCampTestnet()).create();
         accountsManager.setEthereum(ethereum);
         return ethereum;

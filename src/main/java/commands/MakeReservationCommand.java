@@ -7,8 +7,8 @@ import org.adridadou.ethereum.values.EthAccount;
 
 public class MakeReservationCommand extends ReservationCommand {
 
-    public MakeReservationCommand(AccountsManager accountsManager, UserCLI userCLI) {
-        super(accountsManager, userCLI);
+    public MakeReservationCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName) {
+        super(accountsManager, userCLI, cmdName);
     }
 
     @Override

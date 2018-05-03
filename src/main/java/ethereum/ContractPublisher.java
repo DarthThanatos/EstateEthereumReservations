@@ -20,7 +20,9 @@ class ContractPublisher {
         Contract<T> contract = new Contract<>();
         contract.contractSrc = SoliditySource.from(new File("contracts/" + contractFileName));
         contract.compiledContract = ethereum.compile(contract.contractSrc, contractName).get();
+        System.err.println("Compiled, now publishing...");
         contract.contractAddress = ethereum.publishContract(contract.compiledContract, publisherAccount).get();
+        System.err.println("Creating proxy");
         contract.proxy =  ethereum.createContractProxy(contract.compiledContract, contract.contractAddress, publisherAccount,interfaceClass);
         return contract;
     }

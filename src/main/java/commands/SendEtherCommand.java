@@ -14,8 +14,8 @@ public class SendEtherCommand extends TargetedCommandWithAmount {
     private EthereumFacade ethereum;
     private UserCLI userCLI;
 
-    public SendEtherCommand(AccountsManager accountsManager, EthereumFacade ethereum, UserCLI userCLI) {
-        super(accountsManager);
+    public SendEtherCommand(AccountsManager accountsManager, EthereumFacade ethereum, UserCLI userCLI, String cmdName) {
+        super(accountsManager, cmdName);
         this.ethereum = ethereum;
         this.userCLI = userCLI;
     }

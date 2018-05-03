@@ -9,7 +9,8 @@ public class ExitCommand extends CLICommand {
 
     private EthereumFacade ethereum;
 
-    public ExitCommand(EthereumFacade ethereum){
+    public ExitCommand(EthereumFacade ethereum, String userName){
+        super(userName);
         this.ethereum = ethereum;
     }
 

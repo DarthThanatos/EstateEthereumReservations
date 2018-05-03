@@ -7,8 +7,8 @@ import java.util.List;
 
 public class PrintCustomCurrencyBalanceCommand extends PrintCommand {
 
-    public PrintCustomCurrencyBalanceCommand(AccountsManager accountsManager) {
-        super(accountsManager);
+    public PrintCustomCurrencyBalanceCommand(AccountsManager accountsManager, String cmdName) {
+        super(accountsManager, cmdName);
         printerOfAll = AccountsManager::printCustomCurrencyBalances;
         printerOfOne = AccountsManager::printUserCustomCurrencyBalance;
     }

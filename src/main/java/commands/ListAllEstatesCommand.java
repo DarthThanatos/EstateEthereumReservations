@@ -15,7 +15,8 @@ public class ListAllEstatesCommand extends CLICommand {
     private AccountsManager accountsManager;
     private UserCLI userCLI;
 
-    public ListAllEstatesCommand(AccountsManager accountsManager, UserCLI userCLI){
+    public ListAllEstatesCommand(AccountsManager accountsManager, UserCLI userCLI, String cmdName){
+        super(cmdName);
         this.accountsManager = accountsManager;
         this.userCLI = userCLI;
     }
@@ -45,8 +46,7 @@ public class ListAllEstatesCommand extends CLICommand {
         if(parsedCommandLine.args.size() == 0)
             printAllEstates(reservationsForName);
         else{
-            String estateOwnerName = parsedCommandLine.args.get(0);
-            printAllEstatesOfOwner(reservationsForName, estateOwnerName);
+            printAllEstatesOfOwner(reservationsForName);
         }
     }
 
@@ -73,9 +73,9 @@ public class ListAllEstatesCommand extends CLICommand {
         return maxEstates;
     }
 
-    private void printAllEstatesOfOwner(Reservations reservationsForName, String estateOwnerName){
+    private void printAllEstatesOfOwner(Reservations reservationsForName){
         EthAccount account;
-        if((account = getAccount(estateOwnerName)) != null){
+        if((account = getAccount(accountsManager, 0)) != null){
             int maxEstates = getMaxEstatesOfAccount(reservationsForName, account);
             for(int i = 0; i < maxEstates; i++) printEstateOfOwner(reservationsForName, account, i);
         }
@@ -97,11 +97,4 @@ public class ListAllEstatesCommand extends CLICommand {
         return maxEstates;
     }
 
-    private EthAccount getAccount(String estateOwnerName){
-        EthAccount account = accountsManager.getAccount(estateOwnerName);
-        if(account == null){
-            System.out.println("There is no user with such a name");
-        }
-        return  account;
-    }
 }

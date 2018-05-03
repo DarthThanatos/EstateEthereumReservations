@@ -31,7 +31,7 @@ public abstract class CLI {
     public void mainLoop(){
         shouldContinue = true;
         while(shouldContinue){
-            ParsedCommandLine parsedCommandLine = readAndParseLine();
+            ParsedCommandLine parsedCommandLine = readAndParseLine_();
             onParsedCommandLine(parsedCommandLine);
         }
     }
@@ -54,6 +54,7 @@ public abstract class CLI {
         try {
             ConsoleReader console = new ConsoleReader();
             console.setPrompt(getPrompt());
+            CURRENT_PROMPT = getPrompt();
 
             Set<String> strings = getCommands().keySet();
             console.addCompleter(new StringsCompleter(strings.toArray(new String[strings.size()])));
@@ -70,6 +71,8 @@ public abstract class CLI {
     private ParsedCommandLine readAndParseLine_(){
         try {
             System.out.print(getPrompt());
+            CURRENT_PROMPT = getPrompt();
+
             String commandLine = commandsReader.readLine();
             return new ParsedCommandLine().parse(commandLine.trim());
         } catch (IOException e) {
@@ -81,4 +84,5 @@ public abstract class CLI {
     public void setShouldContinue(Boolean shouldContinue){
         this.shouldContinue = shouldContinue;
     }
+    public static String CURRENT_PROMPT = ">";
 }
