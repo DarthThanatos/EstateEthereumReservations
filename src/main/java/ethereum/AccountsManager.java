@@ -65,7 +65,7 @@ public class AccountsManager {
         accounts.put("bob",AccountProvider.from("bob"));
         accounts.put("alice", AccountProvider.from("alice"));
         accounts.put("main", AccountProvider.from("main"));
-        new GenesisCreator(accounts.accounts, configPath);
+        new GenesisCreator(accounts.accounts, configPath).createJSONGenesis();
     }
 
     public TestConfig createTestAccountsConfig(){
@@ -190,4 +190,5 @@ public class AccountsManager {
             return hexToNameMap.get(hexString);
         }
     }
+
 }

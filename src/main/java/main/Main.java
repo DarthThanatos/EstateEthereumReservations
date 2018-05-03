@@ -12,10 +12,10 @@ import org.adridadou.ethereum.values.config.GenesisPath;
 public class Main{
 
     public static boolean DEVEL_PHASE = false;
-    private static final String CONFIG_FILE = "out.json";
+    private static final String CONFIG_FILE = "custom_genesis.json";
 
     private static final AccountsManager accountsManager = new AccountsManager();
-    private static final EthereumFacade ethereum = forTest();
+    private static final EthereumFacade ethereum = forNetwork();
 
     public static  void main(String[] args) throws Exception{
         new MainCLI(ethereum, accountsManager).mainLoop();
@@ -34,16 +34,15 @@ public class Main{
         System.err.println("Before for network");
         DEVEL_PHASE = false;
         accountsManager.createStartingAccounts(CONFIG_FILE);
-        EthereumFacade ethereum = EthereumFacadeProvider.forNetwork(
-                networkCOnfig()
-        ).create();
+        EthereumFacade ethereum =
+                EthereumFacadeProvider.forNetwork( networkCOnfig() ).create();
         accountsManager.setEthereum(ethereum);
         System.err.println("After for network");
         return ethereum;
     }
 
     private static BlockchainConfig.Builder networkCOnfig() {
-        return EthereumJConfigs.privateMiner().genesis(GenesisPath.path("privgen.json")).peerDiscovery(true);
+        return EthereumJConfigs.privateMiner().genesis(GenesisPath.path(CONFIG_FILE)).peerDiscovery(true);
     }
 
 }

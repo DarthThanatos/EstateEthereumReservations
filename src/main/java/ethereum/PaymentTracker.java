@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+
 class PaymentTracker {
 
     private AccountsManager accountsManager;
@@ -83,4 +84,6 @@ class PaymentTracker {
     void handleCancel(ReservationManager.ReservationCanceled reservationCanceled){
         reservationActiveMap.put(new ReservationDetails(reservationCanceled.estateOwnerAddressString, reservationCanceled.estateIndex, reservationCanceled.day), false);
     }
+
 }
+
