@@ -69,7 +69,8 @@ contract Reservations {
         Estate estate = estatesByOwner[estateOwner][estateIndex];
         paid = estate.alreadyPaidAmount[day] == estate.price;
         if(!paid){
-            string tenant = estate.tenantAddressesStrings[day];
+            string memory tenant = estate.tenantAddressesStrings[day];
+            bool wasReserved = estate.daysReservationStates[day];
 
             estate.daysReservationStates[day] = false;
             estate.tenantAddressesStrings[day] = "";
@@ -77,7 +78,8 @@ contract Reservations {
             allEstates[estate.globalIndex].daysReservationStates[day] = false;
             allEstates[estate.globalIndex].tenantAddressesStrings[day] = "";
 
-            ReservationCanceled(toString(estateOwner), estateIndex, estate.name, tenant, day);
+            if(wasReserved)
+                ReservationCanceled(toString(estateOwner), estateIndex, estate.name, tenant, day);
         }
         estate.alreadyPaidAmount[day] = 0;
         allEstates[estate.globalIndex].alreadyPaidAmount[day] = 0;

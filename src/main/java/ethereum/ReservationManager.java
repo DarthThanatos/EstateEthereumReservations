@@ -3,10 +3,8 @@ package ethereum;
 import event.EventHandler;
 import event.SolEvent;
 import interfaces.Reservations;
-import io.reactivex.schedulers.Schedulers;
 import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.values.EthAccount;
-import io.reactivex.Observable;
 import org.adridadou.ethereum.values.EthAddress;
 
 import java.util.Arrays;
@@ -14,20 +12,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
 public class ReservationManager {
 
     private EthereumFacade ethereum;
 
     private ContractPublisher.Contract<Reservations> mainContract;
     private HashMap<String, Reservations> reservations = new HashMap<>();
-    private AccountsManager accountsManager;
+
+    private PaymentTracker paymentTracker;
 
     ReservationManager(EthereumFacade ethereum, ContractPublisher.Contract<Reservations> mainContract, AccountsManager accountsManager){
         this.ethereum = ethereum;
         this.mainContract = mainContract;
-        this.accountsManager = accountsManager;
+        this.paymentTracker = new PaymentTracker(accountsManager);
         observeEvents(accountsManager);
     }
 
@@ -38,81 +35,11 @@ public class ReservationManager {
 
     private void observeEvents(AccountsManager accountsManager){
         observeEvent(accountsManager, "PublishedEstate", PublishedEstate.class);
-        observeEvent(accountsManager, "ReservationMade", ReservationMade.class, this::handleReservation);
-        observeEvent(accountsManager, "ReservationCanceled", ReservationCanceled.class, this::handleCancel);
+        observeEvent(accountsManager, "ReservationMade", ReservationMade.class, paymentTracker::handleReservation);
+        observeEvent(accountsManager, "ReservationCanceled", ReservationCanceled.class, paymentTracker::handleCancel);
     }
 
 
-    class ReservationDetails{
-        final String owner;
-        final int estateIndex;
-        final int day;
-
-        ReservationDetails(String owner, int estateIndex, int day){
-          this.owner = owner;
-          this.estateIndex = estateIndex;
-          this.day = day;
-        }
-        public int hashCode(){
-            int hashcode;
-            hashcode = day * 20;
-            hashcode += estateIndex * 40;
-            hashcode += owner.hashCode();
-            return hashcode;
-        }
-
-        public boolean equals(Object obj){
-            if (obj instanceof ReservationDetails) {
-                ReservationDetails pp = (ReservationDetails) obj;
-                return (pp.owner.equals(this.owner) && pp.estateIndex == this.estateIndex && pp.day == this.day);
-            } else {
-                return false;
-            }
-        }
-    }
-
-    private HashMap<ReservationDetails, Boolean> reservationActiveMap = new HashMap<>();
-
-
-    private void handleReservation(ReservationMade reservationMade){
-        ReservationDetails reservationDetails = new ReservationDetails(reservationMade.estateOwnerAddressString, reservationMade.estateIndex, reservationMade.day);
-        reservationActiveMap.put(reservationDetails, true);
-        Observable.interval(1, TimeUnit.MINUTES).subscribeOn(Schedulers.newThread()).forEachWhile(
-                aLong -> shouldStopObservingReservation(aLong, reservationDetails),
-                Throwable::printStackTrace
-        );
-    }
-
-    @SuppressWarnings("unused")
-    private boolean shouldStopObservingReservation(long l, ReservationDetails reservationDetails){
-
-        System.out.println("checking if reservation is active and paid: account: "
-                + accountsManager.getReadableNameFromHexForm(reservationDetails.owner)
-                + " estate index: " + reservationDetails.estateIndex
-                + " day: " + reservationDetails.day
-        );
-
-        boolean paid = false;
-        try {
-            paid = accountsManager.getReservationsForName("main")
-                    .checkPaidForReservation(
-                            accountsManager.getAcountFromHex(reservationDetails.owner),
-                            reservationDetails.estateIndex,
-                            reservationDetails.day
-                    ).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        boolean reservationActive = reservationActiveMap.get(reservationDetails);
-
-        System.out.println("Paid: " + paid + "; reservation active: " + reservationActive);
-        return reservationActive && paid;
-    }
-
-    private void handleCancel(ReservationCanceled reservationCanceled){
-        reservationActiveMap.put(new ReservationDetails(reservationCanceled.estateOwnerAddressString, reservationCanceled.estateIndex, reservationCanceled.day), false);
-    }
 
     @SuppressWarnings("SameParameterValue")
     private <T extends SolEvent> void observeEvent(AccountsManager accountsManager, String eventName, Class<T> eventClass){
@@ -218,11 +145,11 @@ public class ReservationManager {
 
     public static class ReservationMade extends SolEvent{
 
-        private String estateOwnerAddressString;
-        private int estateIndex;
-        private String name;
-        private String clientAddrString;
-        private int day;
+        final String estateOwnerAddressString;
+        final int estateIndex;
+        final String name;
+        final String clientAddrString;
+        final int day;
 
         public ReservationMade(String estateOwnerAddressString, int estateIndex, String name, String clientAddrString, int day){
             this.estateOwnerAddressString = estateOwnerAddressString;
@@ -251,11 +178,11 @@ public class ReservationManager {
 
     public static class ReservationCanceled extends SolEvent{
 
-        private String estateOwnerAddressString;
-        private int estateIndex;
-        private String name;
-        private String clientAddrString;
-        private int day;
+        final String estateOwnerAddressString;
+        final int estateIndex;
+        final  String name;
+        final  String clientAddrString;
+        final int day;
 
         public ReservationCanceled(String estateOwnerAddressString, int estateIndex, String name, String clientAddrString, int day){
             this.estateOwnerAddressString = estateOwnerAddressString;
@@ -282,10 +209,10 @@ public class ReservationManager {
     }
 
     public static class PublishedEstate extends SolEvent {
-        private String estatesOwnerAddressString;
-        private String name;
-        private int price;
-        private Boolean[]daysAvailabilityStates;
+        final  String estatesOwnerAddressString;
+        final  String name;
+        final  int price;
+        final  Boolean[]daysAvailabilityStates;
 
         public  PublishedEstate(String estatesOwnerAddressString, String name, int price, Boolean[] daysAvailabilityStates){
             this.estatesOwnerAddressString = estatesOwnerAddressString;

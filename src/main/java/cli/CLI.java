@@ -31,7 +31,7 @@ public abstract class CLI {
     public void mainLoop(){
         shouldContinue = true;
         while(shouldContinue){
-            ParsedCommandLine parsedCommandLine = readAndParseLine_();
+            ParsedCommandLine parsedCommandLine = readAndParseLine();
             onParsedCommandLine(parsedCommandLine);
         }
     }
