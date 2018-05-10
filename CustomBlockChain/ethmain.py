@@ -5,7 +5,9 @@ import shutil
 BOOT_N = 3
 N = 3
 
-#C:\Users\Admin\AppData\Roaming\Ethereum
+USER="Robert"
+
+#C:\Users\User\AppData\Roaming\Ethereum
 #eth.getBalance(eth.accounts[0])
 
 # bob's account: 8d50318432fd10fe29035c1736e60808b5cceed2, key: b5d577dc9ce59725e29886632e69ecdf3b6ca49c0a14f4315a2404fc1508672d
@@ -15,34 +17,31 @@ N = 3
 START_BOOT_PORT = 30300
 START_RPC_PORT = 8100
 
-# BOOT_ADDR_1 = "192.168.0.100"
-# BOOT_ADDR_2 = "192.168.0.104"
-# BOOT_ADDR_3 = "192.168.0.101"
+BOOT_ADDRS = [
+	# "127.0.0.1", 
+	#"192.168.0.100", 
+	# "192.168.0.104",
+	"192.168.0.101"
+]
 
-BOOT_ADDR_1 = "127.0.0.1"
-BOOT_ADDR_2 = "127.0.0.1"
-BOOT_ADDR_3 = "127.0.0.1"
+ETH_ADDR_CIDR =  "192.168.0.0/24" #"127.0.0.0/24"
 
 ETH_NODE_BUT =\
 	"geth --datadir=\"{}\" --verbosity 3 --ipcdisable --port {}" +\
-	" --keystore C:\Users\Robert\AppData\Roaming\Ethereum\keystore " +\
+	" --keystore C:\Users\{}\AppData\Roaming\Ethereum\keystore " +\
 	" --networkid 3765 --rpcport {} console  " +\
 	" --bootnodes {} " +\
-	" --netrestrict 127.0.0.0/24 " +\
+	" --netrestrict {} " +\
 	"\n\n"
-	# " --netrestrict 192.168.0.0/24 " +\
+
 	# --mine --minerthreads=1 --etherbase 0xe47691a1d66ae4131cd880ca8b3cc93d21117c3a 
 
-all_boot_nodes = ""
 for i in range(BOOT_N):
 	with open("boot_addr{}".format(i), "r+") as f:
 		content = f.read().replace("\n","")
-		enode_1 = "enode://{}@{}:{}".format(content, BOOT_ADDR_1, START_BOOT_PORT - i)
-		enode_2 = "enode://{}@{}:{}".format(content, BOOT_ADDR_2, START_BOOT_PORT - i)
-		enode_3 = "enode://{}@{}:{}".format(content, BOOT_ADDR_3, START_BOOT_PORT - i)
-		all_boot_nodes += enode_1 + ","
-		all_boot_nodes += enode_2 + ","
-		all_boot_nodes += enode_3 + ("," if i != BOOT_N -1 else " ")
+		all_boot_nodes = ""
+		for j,addr in enumerate(BOOT_ADDRS):
+			all_boot_nodes += "enode://{}@{}:{}".format(content, addr, START_BOOT_PORT - i) + ("," if j != BOOT_ADDRS.__len__() -1 else "")
 
 try:
 	os.mkdir("/tmp")
@@ -75,10 +74,12 @@ for i in range(N):
 	cmd = ETH_NODE_BUT.format(
 		directory,
 		START_BOOT_PORT + i + 1,
+		USER,
 		START_RPC_PORT + i,
-		all_boot_nodes
+		all_boot_nodes,
+		ETH_ADDR_CIDR
 	)
 	print cmd
-	os.system("geth --keystore C:\Users\Robert\AppData\Roaming\Ethereum\keystore init genesis.json --datadir " + directory )
+	os.system("geth --keystore C:\Users\{}\AppData\Roaming\Ethereum\keystore init genesis.json --datadir ".format(USER) + directory )
 	os.system("start cmd /K " + cmd)
 
