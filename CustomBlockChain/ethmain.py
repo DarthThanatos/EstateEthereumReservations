@@ -5,7 +5,7 @@ import shutil
 BOOT_N = 3
 N = 3
 
-USER="Admin"
+USER="Robert"
 
 #C:\Users\User\AppData\Roaming\Ethereum
 #eth.getBalance(eth.accounts[0])
