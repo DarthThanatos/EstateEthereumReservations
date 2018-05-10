@@ -4,7 +4,7 @@ N = 3
 START_PORT = 30300
 BOOT_BAT = "run_bootnode.bat"
 
-BOOT_IP="192.168.0.101"
+BOOT_IP="192.168.0.100"
 # BOOT_IP = "127.0.0.1"
 
 

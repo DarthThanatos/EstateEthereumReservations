@@ -5,7 +5,7 @@ import shutil
 BOOT_N = 3
 N = 3
 
-USER="Robert"
+USER="Admin"
 
 #C:\Users\User\AppData\Roaming\Ethereum
 #eth.getBalance(eth.accounts[0])
@@ -19,7 +19,7 @@ START_RPC_PORT = 8100
 
 BOOT_ADDRS = [
 	# "127.0.0.1", 
-	#"192.168.0.100", 
+	"192.168.0.100", 
 	# "192.168.0.104",
 	"192.168.0.101"
 ]
