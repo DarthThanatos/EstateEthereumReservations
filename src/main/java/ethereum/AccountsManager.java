@@ -145,7 +145,7 @@ public class AccountsManager {
     public void printAccount(String name) {
         EthAccount account = accounts.get(name);
         if(account == null) {System.out.println("There is no account with name: " + name); return;}
-        System.out.println(name + "'s account: " + account.getAddress().toString());
+        System.out.println(name + "'s account: " + account.getAddress().toString() + " private key: " + account.key.getPrivKey().toString(16));
     }
 
 

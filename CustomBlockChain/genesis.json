@@ -1,0 +1,21 @@
+{
+    "difficulty": "0x01",
+    "gasLimit": "0x5b8d80",
+    "coinbase": "0x0000000000000000000000000000000000000000",
+    "mixhash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "extraData": "0x11bbe8db4e347b4e8c937c1c8370e4b5ed33adb3db69cbdb7a38e1e50b1b82fa",
+    "alloc": {
+        "e47691a1d66ae4131cd880ca8b3cc93d21117c3a": {"balance": "300000"},
+        "8d50318432fd10fe29035c1736e60808b5cceed2": {"balance": "400000"},
+        "43382647044a6003d6077e489698f10ab35935bc": {"balance": "500000"}
+    },
+    "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "nonce": "0x0000000000000000",
+    "timestamp": "0x00",
+    "config": {
+        "chainId": 88888,
+        "homesteadBlock": 0,
+        "eip155Block": 0,
+        "eip158Block": 0
+    }
+}
